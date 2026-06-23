@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#070B1C"/>
+<title>Flex · Safe Availability</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
+<style>
+/* ═══════════════════════════ BASE ═══════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --space:#070B1C;
+  --glass-bg:rgba(255,255,255,0.06);
+  --glass-border:rgba(255,255,255,0.14);
+  --glass-highlight:rgba(255,255,255,0.22);
+  --glass-shadow:rgba(0,0,0,0.45);
+  --cyan:#00D4FF;--cyan-dim:rgba(0,212,255,0.18);--cyan-glow:rgba(0,212,255,0.35);
+  --amber:#FFB347;--amber-dim:rgba(255,179,71,0.18);--amber-glow:rgba(255,179,71,0.32);
+  --coral:#FF5F6D;--coral-dim:rgba(255,95,109,0.18);--coral-glow:rgba(255,95,109,0.32);
+  --violet:#A78BFA;--violet-dim:rgba(167,139,250,0.18);--violet-glow:rgba(167,139,250,0.32);
+  --gray-dim:rgba(255,255,255,0.08);
+  --text:#EEF0FF;--text2:#8892B0;--text3:#4A5270;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Inter',system-ui,sans-serif;
+  --r:14px;--r-lg:20px;--r-xl:28px;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--space);
+  color:var(--text);
+  min-height:100vh;
+  padding:0;
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* ═══════════════════════════ AURORA BG ═══════════════════════════ */
+.aurora{
+  position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;
+}
+.aurora-blob{
+  position:absolute;border-radius:50%;filter:blur(120px);opacity:0.22;
+  animation:drift 18s ease-in-out infinite alternate;
+}
+.aurora-blob:nth-child(1){
+  width:600px;height:600px;
+  background:radial-gradient(circle,#1a3aff 0%,transparent 70%);
+  top:-100px;left:-100px;
+  animation-duration:20s;
+}
+.aurora-blob:nth-child(2){
+  width:500px;height:500px;
+  background:radial-gradient(circle,#00d4ff 0%,transparent 70%);
+  top:40%;right:-120px;
+  animation-duration:15s;animation-delay:-7s;
+}
+.aurora-blob:nth-child(3){
+  width:400px;height:400px;
+  background:radial-gradient(circle,#7c3aed 0%,transparent 70%);
+  bottom:-80px;left:30%;
+  animation-duration:22s;animation-delay:-3s;
+}
+@keyframes drift{
+  0%{transform:translate(0,0) scale(1)}
+  100%{transform:translate(60px,40px) scale(1.12)}
+}
+
+/* ═══════════════════════════ LAYOUT ═══════════════════════════ */
+.page{
+  max-width:820px;margin:0 auto;
+  padding:2rem 1rem 4rem;
+  position:relative;z-index:1;
+}
+
+/* ═══════════════════════════ HEADER ═══════════════════════════ */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:2rem;flex-wrap:wrap;gap:12px;
+}
+.header-left{}
+.app-title{
+  font-size:13px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--cyan);
+  font-family:var(--mono);
+}
+.app-sub{
+  font-size:22px;font-weight:700;color:var(--text);
+  letter-spacing:-.02em;margin-top:2px;
+  line-height:1.1;
+}
+.date-pill{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-top-color:var(--glass-highlight);
+  border-radius:40px;
+  padding:8px 18px;
+  font-size:13px;font-weight:600;
+  color:var(--text2);
+  font-family:var(--mono);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+/* ═══════════════════════════ SECTION LABELS ═══════════════════════════ */
+.section-label{
+  font-size:10px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:8px;padding-left:2px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-label::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,var(--glass-border),transparent);
+}
+
+/* ═══════════════════════════ GRID ROWS ═══════════════════════════ */
+.row-past,.row-future{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:6px;
+  margin-bottom:8px;
+}
+.row-today{margin-bottom:8px;}
+
+/* ═══════════════════════════ GLASS TILE BASE ═══════════════════════════ */
+.dtile{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-top-color:var(--glass-highlight);
+  border-radius:var(--r);
+  padding:8px 5px 7px;
+  text-align:center;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:
+    0 4px 16px var(--glass-shadow),
+    inset 0 1px 0 var(--glass-highlight);
+  transition:transform .18s ease,box-shadow .18s ease;
+  cursor:default;
+  position:relative;overflow:hidden;
+}
+.dtile::before{
+  content:'';position:absolute;
+  top:0;left:10%;width:80%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--glass-highlight),transparent);
+}
+.dtile:hover{
+  transform:translateY(-2px) scale(1.03);
+  box-shadow:0 8px 28px var(--glass-shadow),inset 0 1px 0 var(--glass-highlight);
+}
+.dtile.is-past{opacity:0.65}
+
+/* ═══════════════════════════ TODAY TILE ═══════════════════════════ */
+.today-tile{
+  background:rgba(0,212,255,0.06);
+  border:1px solid rgba(0,212,255,0.3);
+  border-top-color:rgba(0,212,255,0.55);
+  border-radius:var(--r-xl);
+  padding:20px 24px;
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  box-shadow:
+    0 0 0 1px rgba(0,212,255,0.1),
+    0 8px 40px rgba(0,0,0,0.5),
+    0 0 80px rgba(0,212,255,0.08),
+    inset 0 1px 0 rgba(0,212,255,0.35);
+  position:relative;overflow:hidden;
+}
+.today-tile::before{
+  content:'';position:absolute;
+  top:0;left:15%;width:70%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,212,255,0.6),transparent);
+}
+.today-tile::after{
+  content:'';position:absolute;
+  inset:0;border-radius:var(--r-xl);
+  background:radial-gradient(ellipse at 50% -20%,rgba(0,212,255,0.12),transparent 60%);
+  pointer-events:none;
+}
+.today-left{flex:1;min-width:140px;}
+.today-dow{
+  font-size:11px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--cyan);
+  font-family:var(--mono);
+}
+.today-dom{
+  font-size:52px;font-weight:700;color:var(--text);
+  font-family:var(--mono);line-height:1;margin:4px 0 2px;
+  text-shadow:0 0 40px rgba(0,212,255,0.4);
+}
+.today-date-full{font-size:12px;color:var(--text2);font-weight:500;}
+.today-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+
+/* ═══════════════════════════ TILE TEXT ═══════════════════════════ */
+.dow{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);}
+.dom{font-size:16px;font-weight:700;color:var(--text);font-family:var(--mono);margin:3px 0 2px;line-height:1;}
+.mon-label{font-size:8px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;}
+
+/* ═══════════════════════════ GLASS INPUTS ═══════════════════════════ */
+.glass-input{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:10px;
+  color:var(--text);
+  font-family:var(--mono);
+  font-weight:600;
+  text-align:center;
+  outline:none;
+  width:100%;
+  height:32px;
+  font-size:13px;
+  -webkit-appearance:none;appearance:none;
+  cursor:pointer;
+  transition:border-color .15s,box-shadow .15s,background .15s;
+  padding:0 4px;
+}
+.glass-input:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 3px var(--cyan-dim),0 0 14px var(--cyan-glow);
+  background:rgba(0,212,255,0.08);
+}
+.glass-input.has-hours{
+  border-color:rgba(0,212,255,0.5);
+  background:rgba(0,212,255,0.1);
+  color:var(--cyan);
+  box-shadow:0 0 8px var(--cyan-dim);
+}
+.glass-input.locked{
+  border-color:rgba(255,95,109,0.3);
+  background:rgba(255,95,109,0.06);
+  color:rgba(255,95,109,0.5);
+  cursor:not-allowed;
+  pointer-events:none;
+}
+.glass-input.error{
+  border-color:rgba(255,95,109,0.8);
+  background:rgba(255,95,109,0.1);
+  color:var(--coral);
+  box-shadow:0 0 0 3px rgba(255,95,109,0.2),0 0 16px rgba(255,95,109,0.3);
+  animation:shake .3s ease;
+}
+@keyframes shake{
+  0%{transform:translateX(0)}20%{transform:translateX(-5px)}
+  40%{transform:translateX(5px)}60%{transform:translateX(-4px)}
+  80%{transform:translateX(3px)}100%{transform:translateX(0)}
+}
+/* Inline tile error banner */
+.tile-error{
+  font-size:9px;font-weight:700;color:var(--coral);
+  background:rgba(255,95,109,0.1);
+  border:1px solid rgba(255,95,109,0.25);
+  border-radius:6px;padding:3px 6px;margin-top:3px;
+  font-family:var(--mono);line-height:1.3;
+  animation:fadeUp .2s ease;
+}
+.today-tile .tile-error{font-size:11px;padding:6px 12px;border-radius:10px;width:100%;margin-top:8px;}
+/* Toast notification */
+#toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:rgba(20,10,10,0.92);
+  border:1px solid rgba(255,95,109,0.45);
+  border-top-color:rgba(255,95,109,0.7);
+  border-radius:16px;
+  padding:12px 22px;
+  font-size:13px;font-weight:600;color:var(--coral);
+  font-family:var(--mono);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:0 0 0 1px rgba(255,95,109,0.1),0 8px 32px rgba(0,0,0,0.5),0 0 40px rgba(255,95,109,0.12);
+  z-index:999;opacity:0;pointer-events:none;
+  transition:opacity .25s ease,transform .25s ease;
+  white-space:nowrap;
+  display:flex;align-items:center;gap:10px;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast .ti{font-size:16px;}
+
+/* today input bigger */
+.today-tile .glass-input.hrs{
+  width:80px;height:50px;font-size:20px;border-radius:14px;
+}
+.today-tile .glass-input.hrs:focus{
+  box-shadow:0 0 0 3px var(--cyan-dim),0 0 24px var(--cyan-glow);
+}
+
+.glass-select{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:8px;
+  color:var(--text2);
+  font-family:var(--sans);
+  font-size:9px;
+  font-weight:500;
+  outline:none;
+  width:100%;
+  height:24px;
+  cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+  padding:0 3px;
+  text-overflow:ellipsis;
+  transition:border-color .15s;
+  margin-bottom:4px;
+}
+.today-tile .glass-select{
+  width:200px;height:50px;font-size:13px;
+  border-radius:14px;padding:0 14px;
+}
+.glass-select:focus{border-color:var(--cyan);}
+
+/* ═══════════════════════════ STATUS PILLS ═══════════════════════════ */
+.spill{
+  display:inline-block;
+  font-size:9px;font-weight:700;
+  letter-spacing:.04em;
+  border-radius:6px;
+  padding:2px 5px;
+  margin-top:2px;
+  font-family:var(--mono);
+  border:1px solid transparent;
+}
+.today-tile .spill{font-size:12px;padding:8px 16px;border-radius:12px;}
+.sp-avail{background:var(--cyan-dim);color:var(--cyan);border-color:rgba(0,212,255,0.25);}
+.sp-booked{background:var(--violet-dim);color:var(--violet);border-color:rgba(167,139,250,0.25);}
+.sp-lim{background:var(--amber-dim);color:var(--amber);border-color:rgba(255,179,71,0.25);}
+.sp-full{background:var(--coral-dim);color:var(--coral);border-color:rgba(255,95,109,0.25);}
+.sp-excl{background:var(--gray-dim);color:var(--text3);border-color:rgba(255,255,255,0.08);}
+
+/* ═══════════════════════════ DIVIDER ═══════════════════════════ */
+.glow-divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,212,255,0.3),transparent);
+  margin:14px 0;
+}
+
+/* ═══════════════════════════ SUMMARY ═══════════════════════════ */
+.summary{
+  margin-top:2rem;
+  padding-top:1.5rem;
+  border-top:1px solid var(--glass-border);
+}
+.summary-title{
+  font-size:10px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text3);
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.summary-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--glass-border),transparent);}
+
+/* Alert bar */
+.alert-bar{
+  border-radius:var(--r-lg);
+  padding:14px 18px;
+  font-size:13px;font-weight:500;line-height:1.6;
+  margin-bottom:1.25rem;
+  border:1px solid transparent;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  position:relative;overflow:hidden;
+}
+.alert-bar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:inherit;filter:brightness(3);opacity:.4;
+}
+.ab-ok{background:rgba(0,212,255,0.08);border-color:rgba(0,212,255,0.25);color:var(--cyan);}
+.ab-warn{background:rgba(255,179,71,0.08);border-color:rgba(255,179,71,0.25);color:var(--amber);}
+.ab-full{background:rgba(255,95,109,0.08);border-color:rgba(255,95,109,0.25);color:var(--coral);}
+.ab-info{background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.25);color:var(--violet);}
+
+/* Metric cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.5rem;}
+.mcard{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-top-color:var(--glass-highlight);
+  border-radius:var(--r-lg);
+  padding:16px 18px;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 4px 20px rgba(0,0,0,0.3),inset 0 1px 0 var(--glass-highlight);
+  position:relative;overflow:hidden;
+}
+.mcard::before{
+  content:'';position:absolute;top:0;left:15%;width:70%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--glass-highlight),transparent);
+}
+.mc-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+.mc-val{font-size:28px;font-weight:700;font-family:var(--mono);line-height:1;}
+.mc-sub{font-size:10px;color:var(--text3);margin-top:4px;font-weight:500;}
+.mc-cyan{color:var(--cyan);text-shadow:0 0 20px var(--cyan-glow);}
+.mc-amber{color:var(--amber);text-shadow:0 0 20px var(--amber-glow);}
+.mc-coral{color:var(--coral);text-shadow:0 0 20px var(--coral-glow);}
+.mc-violet{color:var(--violet);text-shadow:0 0 20px var(--violet-glow);}
+.mc-white{color:var(--text);}
+
+/* Window bars */
+.win-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;}
+.win-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px;
+}
+.wg-cell{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-top-color:var(--glass-highlight);
+  border-radius:12px;
+  padding:10px 6px 8px;
+  text-align:center;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  box-shadow:0 4px 16px rgba(0,0,0,0.3),inset 0 1px 0 var(--glass-highlight);
+  transition:transform .15s ease,box-shadow .15s ease;
+  position:relative;overflow:hidden;
+  cursor:default;
+}
+.wg-cell::before{
+  content:'';position:absolute;top:0;left:15%;width:70%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--glass-highlight),transparent);
+}
+.wg-cell:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4),inset 0 1px 0 var(--glass-highlight);}
+.wg-cell.wg-worst{
+  border-color:rgba(255,95,109,0.45);
+  border-top-color:rgba(255,95,109,0.7);
+  background:rgba(255,95,109,0.07);
+  box-shadow:0 4px 20px rgba(255,95,109,0.15),0 0 0 1px rgba(255,95,109,0.1),inset 0 1px 0 rgba(255,95,109,0.3);
+}
+.wg-cell.wg-worst::before{background:linear-gradient(90deg,transparent,rgba(255,95,109,0.5),transparent);}
+.wg-off{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;font-family:var(--mono);}
+.wg-range{font-size:9px;color:var(--text2);font-family:var(--mono);line-height:1.4;margin-bottom:6px;}
+.wg-hrs{font-size:22px;font-weight:700;font-family:var(--mono);line-height:1;margin-bottom:3px;}
+.wg-cap{font-size:9px;color:var(--text3);font-family:var(--mono);}
+.wg-bar-wrap{margin:6px 4px 0;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;}
+.wg-bar-fill{height:100%;border-radius:2px;transition:width .3s ease;}
+.wg-worst-tag{
+  display:inline-block;margin-top:5px;
+  font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--coral);font-family:var(--mono);
+  background:rgba(255,95,109,0.12);border-radius:4px;padding:1px 5px;
+}
+.wg-safe-tag{
+  display:inline-block;margin-top:5px;
+  font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  font-family:var(--mono);
+  border-radius:4px;padding:1px 5px;
+}
+
+/* Chips */
+.chips-wrap{margin-top:1.25rem;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.chip{
+  font-size:11px;font-weight:600;font-family:var(--mono);
+  padding:5px 10px 5px 12px;border-radius:20px;
+  display:flex;align-items:center;gap:7px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid transparent;
+}
+.ch-c{background:var(--cyan-dim);color:var(--cyan);border-color:rgba(0,212,255,0.2);}
+.ch-u{background:var(--violet-dim);color:var(--violet);border-color:rgba(167,139,250,0.2);}
+.ch-p{background:var(--amber-dim);color:var(--amber);border-color:rgba(255,179,71,0.2);}
+.ch-x{background:var(--gray-dim);color:var(--text3);border-color:rgba(255,255,255,0.08);}
+.chip button{background:none;border:none;cursor:pointer;font-size:15px;line-height:1;color:inherit;opacity:.45;padding:0;transition:opacity .1s;}
+.chip button:hover{opacity:1;}
+.empty-msg{font-size:12px;color:var(--text3);padding:8px 0;font-style:italic;}
+
+/* ═══════════════════════════ RESET BUTTON ═══════════════════════════ */
+.reset-btn{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,95,109,0.08);
+  border:1px solid rgba(255,95,109,0.3);
+  border-top-color:rgba(255,95,109,0.5);
+  border-radius:40px;
+  padding:7px 16px;
+  font-size:12px;font-weight:600;
+  color:var(--coral);
+  font-family:var(--sans);
+  cursor:pointer;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:0 2px 12px rgba(255,95,109,0.1),inset 0 1px 0 rgba(255,95,109,0.2);
+  transition:background .15s,box-shadow .15s,transform .12s;
+  letter-spacing:.02em;
+}
+.reset-btn:hover{
+  background:rgba(255,95,109,0.15);
+  box-shadow:0 4px 20px rgba(255,95,109,0.22),inset 0 1px 0 rgba(255,95,109,0.3);
+  transform:translateY(-1px);
+}
+.reset-btn:active{transform:scale(0.97);}
+.reset-btn .ti{font-size:14px;}
+
+/* ═══════════════════════════ CONFIRM MODAL ═══════════════════════════ */
+.confirm-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(4,6,18,0.75);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease;
+}
+.confirm-overlay.open{
+  opacity:1;pointer-events:all;
+  animation:fadeIn .2s ease;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.confirm-box{
+  background:rgba(12,16,36,0.92);
+  border:1px solid rgba(255,95,109,0.3);
+  border-top-color:rgba(255,95,109,0.55);
+  border-radius:24px;
+  padding:32px 32px 28px;
+  max-width:340px;width:90%;
+  text-align:center;
+  box-shadow:
+    0 0 0 1px rgba(255,95,109,0.08),
+    0 24px 80px rgba(0,0,0,0.7),
+    0 0 60px rgba(255,95,109,0.08);
+  animation:popUp .22s cubic-bezier(.34,1.56,.64,1);
+  position:relative;overflow:hidden;
+}
+.confirm-box::before{
+  content:'';position:absolute;top:0;left:15%;width:70%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,95,109,0.5),transparent);
+}
+@keyframes popUp{from{opacity:0;transform:scale(0.88)}to{opacity:1;transform:scale(1)}}
+.confirm-icon{
+  width:56px;height:56px;border-radius:50%;
+  background:rgba(255,95,109,0.1);
+  border:1px solid rgba(255,95,109,0.3);
+  box-shadow:0 0 20px rgba(255,95,109,0.15),inset 0 1px 0 rgba(255,95,109,0.2);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;
+  font-size:26px;color:var(--coral);
+  line-height:1;
+}
+.confirm-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.confirm-sub{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:24px;}
+.confirm-actions{display:flex;gap:10px;}
+.confirm-btn{
+  flex:1;height:44px;border-radius:14px;
+  font-size:13px;font-weight:700;
+  font-family:var(--sans);cursor:pointer;
+  transition:background .14s,transform .1s,box-shadow .14s;
+  border:1px solid transparent;
+}
+.confirm-btn:active{transform:scale(0.97);}
+.confirm-cancel{
+  background:rgba(255,255,255,0.06);
+  border-color:rgba(255,255,255,0.12);
+  color:var(--text2);
+}
+.confirm-cancel:hover{background:rgba(255,255,255,0.1);}
+.confirm-ok{
+  background:rgba(255,95,109,0.14);
+  border-color:rgba(255,95,109,0.4);
+  color:var(--coral);
+  box-shadow:0 0 20px rgba(255,95,109,0.12);
+}
+.confirm-ok:hover{
+  background:rgba(255,95,109,0.24);
+  box-shadow:0 0 28px rgba(255,95,109,0.22);
+}
+
+/* ═══════════════════════════ SUCCESS TOAST variant ═══════════════════════════ */
+#toast.success{
+  border-color:rgba(0,212,255,0.45);
+  border-top-color:rgba(0,212,255,0.7);
+  color:var(--cyan);
+  background:rgba(0,10,20,0.92);
+  box-shadow:0 0 0 1px rgba(0,212,255,0.08),0 8px 32px rgba(0,0,0,0.5),0 0 40px rgba(0,212,255,0.1);
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.page{animation:fadeUp .4s ease both;}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;}
+}
+
+/* ═══════════════════════════ RESPONSIVE ═══════════════════════════ */
+
+/* Tablet landscape / small desktop (≤900px) */
+@media(max-width:900px){
+  .win-grid{grid-template-columns:repeat(4,1fr);}
+  .wg-hrs{font-size:18px;}
+}
+
+/* Tablet portrait — iPad ~768px */
+@media(max-width:768px){
+  .page{padding:1.5rem .875rem 3rem;}
+  .app-sub{font-size:18px;}
+  .today-dom{font-size:40px;}
+  .cards{grid-template-columns:repeat(2,1fr);}
+  .win-grid{grid-template-columns:repeat(4,1fr);}
+}
+
+/* Large phone / small tablet ≤600px */
+@media(max-width:600px){
+  .page{padding:1.25rem .75rem 3rem;}
+
+  /* Header stack */
+  .header{flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:1.25rem;}
+  .header > div:last-child{width:100%;display:flex;justify-content:space-between;align-items:center;}
+  .app-sub{font-size:19px;}
+  .date-pill{font-size:11px;padding:5px 12px;}
+
+  /* Past/future: 3 cols */
+  .row-past,.row-future{grid-template-columns:repeat(3,1fr);gap:5px;}
+
+  /* Today tile: vertical stack */
+  .today-tile{flex-direction:column;align-items:stretch;padding:14px;gap:10px;}
+  .today-left{display:flex;align-items:baseline;gap:10px;}
+  .today-dom{font-size:34px;margin:0;}
+  .today-dow{font-size:10px;}
+  .today-date-full{font-size:11px;align-self:flex-end;padding-bottom:3px;}
+  .today-right{display:grid;grid-template-columns:1fr 72px auto;align-items:center;gap:8px;width:100%;}
+  .today-tile .glass-select{width:100%;height:44px;font-size:12px;padding:0 10px;}
+  .today-tile .glass-input.hrs{width:100%;height:44px;font-size:16px;border-radius:12px;}
+  .today-tile .spill{font-size:11px;padding:6px 10px;white-space:nowrap;border-radius:10px;}
+
+  /* Small tiles */
+  .dtile{padding:6px 3px 5px;border-radius:10px;}
+  .dom{font-size:14px;}
+  .dow{font-size:8px;}
+  .glass-input{height:28px;font-size:11px;}
+  .glass-select{font-size:8px;height:22px;}
+  .spill{font-size:8px;padding:2px 4px;}
+
+  /* Cards 2-col */
+  .cards{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.25rem;}
+  .mc-val{font-size:22px;}
+  .mcard{padding:12px 14px;}
+
+  /* Window grid 2-col */
+  .win-grid{grid-template-columns:repeat(2,1fr);gap:6px;}
+  .wg-hrs{font-size:16px;}
+  .wg-off{font-size:8px;}
+  .wg-range{font-size:8px;}
+  .wg-cap{font-size:8px;}
+
+  /* Alert bar */
+  .alert-bar{font-size:12px;padding:11px 13px;}
+
+  /* Toast full-width */
+  #toast{
+    left:12px;right:12px;bottom:16px;
+    transform:translateY(20px);
+    white-space:normal;text-align:center;
+    justify-content:center;border-radius:14px;
+    font-size:12px;
+  }
+  #toast.show{transform:translateY(0);}
+
+  /* Modal */
+  .confirm-box{padding:24px 20px 22px;border-radius:20px;max-width:calc(100vw - 32px);}
+  .confirm-title{font-size:16px;}
+  .confirm-sub{font-size:12px;margin-bottom:20px;}
+  .confirm-btn{height:42px;font-size:13px;}
+}
+
+/* iPhone SE / very small ≤380px */
+@media(max-width:380px){
+  .page{padding:1rem .625rem 2.5rem;}
+  .app-sub{font-size:16px;}
+  .reset-btn{padding:5px 11px;font-size:11px;}
+
+  .row-past,.row-future{gap:4px;}
+  .dtile{padding:5px 2px 4px;border-radius:8px;}
+  .dom{font-size:13px;}
+
+  .today-dom{font-size:28px;}
+  .today-tile{padding:12px;}
+  .today-right{grid-template-columns:1fr 60px auto;gap:6px;}
+  .today-tile .glass-input.hrs{height:40px;font-size:14px;}
+  .today-tile .glass-select{height:40px;font-size:11px;}
+  .today-tile .spill{font-size:10px;padding:5px 8px;}
+
+  .mc-val{font-size:20px;}
+  .mcard{padding:10px 11px;}
+  .cards{gap:6px;}
+
+  .win-grid{gap:5px;}
+  .wg-hrs{font-size:14px;}
+  .wg-range{font-size:7px;}
+}
+
+/* Landscape phone */
+@media(max-width:768px) and (orientation:landscape){
+  .page{padding:1rem .875rem 2rem;}
+  .today-tile{flex-direction:row;align-items:center;padding:10px 16px;}
+  .today-dom{font-size:30px;}
+  .today-right{grid-template-columns:none;display:flex;flex-wrap:wrap;}
+  .row-past,.row-future{grid-template-columns:repeat(6,1fr);}
+  .win-grid{grid-template-columns:repeat(7,1fr);}
+  .wg-hrs{font-size:13px;}
+  .wg-range{font-size:7px;}
+  .cards{grid-template-columns:repeat(4,1fr);}
+}
+
+/* Touch devices: bigger tap targets, disable hover lifts */
+@media(hover:none) and (pointer:coarse){
+  .glass-input{min-height:36px;}
+  .glass-select{min-height:28px;}
+  .chip button{padding:4px 8px;opacity:.7;font-size:16px;}
+  .dtile:hover{transform:none;box-shadow:0 4px 16px var(--glass-shadow),inset 0 1px 0 var(--glass-highlight);}
+  .wg-cell:hover{transform:none;box-shadow:0 4px 16px rgba(0,0,0,0.3),inset 0 1px 0 var(--glass-highlight);}
+  .reset-btn:hover{transform:none;}
+}
+</style>
+</head>
+<body>
+<div class="aurora" aria-hidden="true">
+  <div class="aurora-blob"></div>
+  <div class="aurora-blob"></div>
+  <div class="aurora-blob"></div>
+</div>
+
+<div class="page">
+  <div class="header">
+    <div class="header-left">
+      <div class="app-title">Amazon Flex</div>
+      <div class="app-sub">Safe Availability</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div class="date-pill" id="datePill"></div>
+      <button id="resetBtn" class="reset-btn" aria-label="Reset all shifts">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Confirm modal -->
+  <div id="confirmOverlay" class="confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="confirm-box">
+      <div class="confirm-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <div class="confirm-title" id="confirmTitle">Reset all shifts?</div>
+      <div class="confirm-sub">This will clear every hour entered across all 13 days. This cannot be undone.</div>
+      <div class="confirm-actions">
+        <button id="confirmCancel" class="confirm-btn confirm-cancel">Cancel</button>
+        <button id="confirmOk" class="confirm-btn confirm-ok">Yes, reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Past 6 days</div>
+  <div class="row-past" id="rowPast"></div>
+
+  <div class="glow-divider"></div>
+
+  <div class="section-label">Today</div>
+  <div id="rowToday"></div>
+
+  <div class="glow-divider"></div>
+
+  <div class="section-label">Next 6 days</div>
+  <div class="row-future" id="rowFuture"></div>
+
+  <div class="summary" id="summary"></div>
+</div>
+<div id="toast" role="alert" aria-live="assertive">
+  <svg id="toastIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+  </svg>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+/* ═══════ CORE LOGIC (unchanged calculation) ═══════ */
+const EXCL=new Set(['cancelled','missed','amazon_cancelled_unpaid']);
+const COUNTED=s=>!EXCL.has(s);
+
+let shifts={};
+try{const s=localStorage.getItem('flexShiftsV3');if(s)shifts=JSON.parse(s);}catch(e){}
+function save(){try{localStorage.setItem('flexShiftsV3',JSON.stringify(shifts));}catch(e){}}
+
+function ds(d){
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+  return`${y}-${m}-${day}`;
+}
+function addD(dateStr,n){const d=pd(dateStr);d.setDate(d.getDate()+n);return ds(d);}
+function pd(s){const[y,m,day]=s.split('-').map(Number);return new Date(y,m-1,day);}
+function fmtS(s){return pd(s).toLocaleDateString('en-GB',{day:'numeric',month:'short'});}
+function fmtDow(s){return pd(s).toLocaleDateString('en-GB',{weekday:'short'});}
+function fmtMon(s){return pd(s).toLocaleDateString('en-GB',{month:'short'});}
+function fmtFull(s){return pd(s).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}
+function getToday(){return ds(new Date());}
+
+function hoursOn(d){const e=shifts[d];return(e&&COUNTED(e.status))?(e.hours||0):0;}
+function calc(target,limit=24){
+  const wins=[];
+  for(let off=-6;off<=0;off++){
+    const ws=addD(target,off);
+    let total=0;
+    for(let i=0;i<7;i++)total+=hoursOn(addD(ws,i));
+    wins.push({off,start:ws,total});
+  }
+  const rawTotal=wins.find(w=>w.off===0).total;
+  const worst=Math.max(...wins.map(w=>w.total));
+  const safe=Math.max(0,+(limit-worst).toFixed(1));
+  const raw=Math.max(0,+(limit-rawTotal).toFixed(1));
+  const fut=new Set();
+  wins.forEach(w=>{
+    if(w.off<0)for(let i=1;i<7;i++){const dd=addD(w.start,i);if(dd>target&&hoursOn(dd)>0)fut.add(dd);}
+  });
+  return{safe,raw,worst,rawTotal,wins,blockedByFuture:safe<raw,futureDates:[...fut].sort()};
+}
+
+function pilClass(d){
+  const e=shifts[d];
+  if(e&&!COUNTED(e.status))return'excl';
+  const hrs=e&&COUNTED(e.status)?(e.hours||0):0;
+  const r=calc(d);
+  if(hrs>0)return'booked';
+  if(r.safe===0)return'full';
+  if(r.safe<4)return'lim';
+  return'avail';
+}
+function pilTxt(d){
+  const e=shifts[d];
+  if(e&&!COUNTED(e.status))return'excl';
+  const hrs=e&&COUNTED(e.status)?(e.hours||0):0;
+  const r=calc(d);
+  if(hrs>0)return hrs+'h';
+  if(r.safe===0)return'Full';
+  if(r.safe<4)return r.safe+'h';
+  return r.safe+'h';
+}
+const spMap={avail:'sp-avail',booked:'sp-booked',lim:'sp-lim',full:'sp-full',excl:'sp-excl'};
+const pillLabel={avail:'safe',booked:'booked',lim:'left',full:'full',excl:'excl'};
+
+/* ═══════ STATUS OPTIONS ═══════ */
+const statusOpts=[
+  {v:'upcoming',l:'Upcoming / booked'},
+  {v:'completed',l:'Completed'},
+  {v:'amazon_cancelled_paid',l:'Amazon cancelled (paid)'},
+  {v:'cancelled',l:'Cancelled (excl.)'},
+  {v:'missed',l:'Missed (excl.)'},
+];
+
+/* ═══════ TILE BUILDERS ═══════ */
+function makeSmallTile(d,isToday){
+  const today=getToday();
+  const e=shifts[d]||{hours:0,status:'upcoming'};
+  const hrsVal=e.hours||0;
+  const pc=pilClass(d);
+  const pt=pilTxt(d);
+  const isPast=d<today;
+
+  const tile=document.createElement('div');
+  tile.className='dtile'+(isPast?' is-past':'');
+  tile.dataset.d=d;
+
+  const iCls='glass-input'+(hrsVal>0?' has-hours':'')+((!COUNTED(e.status))?' excl':'');
+  const opts=statusOpts.map(o=>`<option value="${o.v}"${(e.status||'upcoming')===o.v?' selected':''}>${o.l}</option>`).join('');
+
+  tile.innerHTML=`
+    <div class="dow">${fmtDow(d).slice(0,3)}</div>
+    <div class="dom">${pd(d).getDate()}</div>
+    <div class="mon-label">${fmtMon(d)}</div>
+    <select class="glass-select" data-d="${d}">${opts}</select>
+    <div style="margin:0 0 3px">
+      <input class="${iCls}" type="number" min="0" max="12" step="0.5"
+        value="${hrsVal||''}" placeholder="0" data-d="${d}" aria-label="Hours for ${fmtS(d)}"/>
+    </div>
+    <span class="spill ${spMap[pc]||'sp-avail'}">${pt} <span style="opacity:.6;font-size:8px">${pillLabel[pc]||''}</span></span>`;
+  return tile;
+}
+
+function makeTodayTile(d){
+  const e=shifts[d]||{hours:0,status:'upcoming'};
+  const hrsVal=e.hours||0;
+  const pc=pilClass(d);
+  const pt=pilTxt(d);
+
+  const tile=document.createElement('div');
+  tile.className='today-tile';
+  tile.dataset.d=d;
+
+  const iCls='glass-input hrs'+(hrsVal>0?' has-hours':'')+((!COUNTED(e.status))?' excl':'');
+  const opts=statusOpts.map(o=>`<option value="${o.v}"${(e.status||'upcoming')===o.v?' selected':''}>${o.l}</option>`).join('');
+
+  tile.innerHTML=`
+    <div class="today-left">
+      <div class="today-dow">${fmtDow(d)}</div>
+      <div class="today-dom">${pd(d).getDate()}</div>
+      <div class="today-date-full">${fmtFull(d)}</div>
+    </div>
+    <div class="today-right">
+      <select class="glass-select" data-d="${d}">${opts}</select>
+      <input class="${iCls}" type="number" min="0" max="12" step="0.5"
+        value="${hrsVal||''}" placeholder="0h" data-d="${d}" aria-label="Hours for today"/>
+      <span class="spill ${spMap[pc]||'sp-avail'}" style="font-size:13px;padding:8px 14px;border-radius:12px">${pt} <span style="opacity:.7;font-size:10px">${pillLabel[pc]||''}</span></span>
+    </div>`;
+  return tile;
+}
+
+/* ═══════ TOAST ═══════ */
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+/* ═══════ CHECK if a date is fully blocked (safe=0 and nothing booked there yet) ═══════ */
+function isLocked(d){
+  const existing=shifts[d];
+  const alreadyBooked=existing&&COUNTED(existing.status)&&(existing.hours||0)>0;
+  if(alreadyBooked)return false; // already has hours — allow editing
+  const r=calc(d);
+  return r.safe===0;
+}
+
+/* ═══════ CALC worst window total AFTER hypothetically placing hrs on d ═══════ */
+function calcIfAdd(d,hrs,status,limit=24){
+  // Temporarily snapshot, inject, calc, restore
+  const prev=shifts[d];
+  if(COUNTED(status)&&hrs>0) shifts[d]={hours:hrs,status};
+  else delete shifts[d];
+  const r=calc(d);
+  // restore
+  if(prev) shifts[d]=prev; else delete shifts[d];
+  return r;
+}
+
+/* ═══════ BIND ═══════ */
+function bindTile(tile,d){
+  const inp=tile.querySelector(`input[data-d="${d}"]`);
+  const sel=tile.querySelector(`select[data-d="${d}"]`);
+  if(!inp||!sel)return;
+
+  // Apply locked state on initial bind
+  function applyLockState(){
+    const isToday=tile.classList.contains('today-tile');
+    const base=isToday?'glass-input hrs':'glass-input';
+    const e=shifts[d]||{};
+    const hrs=e.hours||0;const status=e.status||'upcoming';
+    const locked=isLocked(d);
+    if(locked){
+      inp.className=base+' locked';
+      inp.title='No safe hours available on this date';
+      inp.setAttribute('tabindex','-1');
+    } else {
+      inp.className=base+(hrs>0?' has-hours':'')+((!COUNTED(status))?' excl':'');
+      inp.removeAttribute('tabindex');
+      inp.title='';
+    }
+  }
+  applyLockState();
+
+  // Remove any existing error banner
+  function clearError(){
+    const existing=tile.querySelector('.tile-error');
+    if(existing)existing.remove();
+  }
+
+  // Show inline error on the tile
+  function showTileError(msg){
+    clearError();
+    const err=document.createElement('div');
+    err.className='tile-error';
+    err.textContent=msg;
+    // Insert after the input or after today-right
+    const isToday=tile.classList.contains('today-tile');
+    if(isToday){
+      tile.appendChild(err);
+      tile.style.flexWrap='wrap';
+    } else {
+      inp.closest('div')?inp.closest('div').after(err):inp.after(err);
+    }
+    inp.className=(tile.classList.contains('today-tile')?'glass-input hrs':'glass-input')+' error';
+    setTimeout(()=>{
+      inp.className=inp.className.replace(' error','');
+    },2000);
+    setTimeout(()=>{clearError();},4000);
+  }
+
+  const commit=()=>{
+    clearError();
+    const hrs=parseFloat(inp.value)||0;
+    const status=sel.value;
+
+    // If excluded status — always allow (no cap impact)
+    if(!COUNTED(status)){
+      if(hrs>0)shifts[d]={hours:hrs,status};
+      else delete shifts[d];
+      save();refreshPills();renderSummary();applyLockState();
+      return;
+    }
+
+    // If trying to clear hours — always allow
+    if(hrs===0){
+      delete shifts[d];
+      save();refreshPills();renderSummary();applyLockState();
+      return;
+    }
+
+    // Check if this date is fully blocked (safe=0, nothing booked here yet)
+    const existing=shifts[d];
+    const alreadyHere=existing&&COUNTED(existing.status)?(existing.hours||0):0;
+    if(alreadyHere===0&&isLocked(d)){
+      const r=calc(d);
+      const msg=`Blocked — worst window already at ${+r.worst.toFixed(1)}h / 24h`;
+      showTileError(msg);
+      showToast(`${fmtS(d)} is full · ${msg}`);
+      inp.value='';
+      return;
+    }
+
+    // Simulate adding these hours and check every window
+    const simR=calcIfAdd(d,hrs,status);
+    if(simR.worst>24){
+      const over=+(simR.worst-24).toFixed(1);
+      const max=Math.max(0,+(24-(simR.worst-hrs)).toFixed(1));
+      const msg=`${hrs}h exceeds cap by ${over}h · max you can add: ${max}h`;
+      showTileError(msg);
+      showToast(`${fmtS(d)} · ${msg}`);
+      // Reset input to previous valid value
+      inp.value=alreadyHere||'';
+      inp.className=(tile.classList.contains('today-tile')?'glass-input hrs':'glass-input')
+        +(alreadyHere>0?' has-hours':'');
+      return;
+    }
+
+    // All good — commit
+    shifts[d]={hours:hrs,status};
+    save();
+    refreshPills();
+    renderSummary();
+    applyLockState();
+
+    // After saving, re-lock any tiles that are now full
+    document.querySelectorAll('[data-d]').forEach(t=>{
+      const td=t.dataset.d;if(!td)return;
+      const ti=t.querySelector('input');if(!ti)return;
+      const isT=t.classList.contains('today-tile');
+      const base=isT?'glass-input hrs':'glass-input';
+      const te=shifts[td]||{};
+      const th=te.hours||0;const ts=te.status||'upcoming';
+      if(isLocked(td)){
+        ti.className=base+' locked';
+        ti.title='No safe hours available';
+        ti.setAttribute('tabindex','-1');
+      } else {
+        ti.className=base+(th>0?' has-hours':'')+((!COUNTED(ts))?' excl':'');
+        ti.title='';ti.removeAttribute('tabindex');
+      }
+    });
+  };
+
+  inp.addEventListener('change',commit);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur();});
+  sel.addEventListener('change',()=>{
+    applyLockState();
+    commit();
+  });
+}
+
+function refreshPills(){
+  document.querySelectorAll('[data-d]').forEach(t=>{
+    const d=t.dataset.d;
+    if(!d)return;
+    const pill=t.querySelector('.spill');
+    const pc=pilClass(d);
+    const pt=pilTxt(d);
+    if(pill){
+      pill.className='spill '+(spMap[pc]||'sp-avail');
+      if(t.classList.contains('today-tile'))pill.style.cssText='font-size:13px;padding:8px 14px;border-radius:12px';
+      pill.innerHTML=`${pt} <span style="opacity:.6;font-size:${t.classList.contains('today-tile')?'10':'8'}px">${pillLabel[pc]||''}</span>`;
+    }
+    const inp=t.querySelector('input');
+    if(inp){
+      const e=shifts[d]||{};
+      const hrs=e.hours||0;const status=e.status||'upcoming';
+      const base=t.classList.contains('today-tile')?'glass-input hrs':'glass-input';
+      if(isLocked(d)){
+        inp.className=base+' locked';
+        inp.title='No safe hours available';
+        inp.setAttribute('tabindex','-1');
+      } else {
+        inp.className=base+(hrs>0?' has-hours':'')+((!COUNTED(status))?' excl':'');
+        inp.title='';inp.removeAttribute('tabindex');
+      }
+    }
+  });
+}
+
+/* ═══════ SUMMARY ═══════ */
+function renderSummary(){
+  const today=getToday();
+  const r=calc(today);
+  const bh=hoursOn(today);
+
+  let abCls,abMsg;
+  if(bh>0){abCls='ab-info';abMsg=`Today has ${bh}h booked. Worst window: ${+r.worst.toFixed(1)}h / 24h.`;}
+  else if(r.safe===0){
+    abCls='ab-full';
+    abMsg=`No hours available today — worst window at ${+r.worst.toFixed(1)}h / 24h.`
+      +(r.blockedByFuture?` Future shifts on ${r.futureDates.map(fmtS).join(', ')} are the cause.`:'');
+  }
+  else if(r.blockedByFuture){
+    abCls='ab-warn';
+    abMsg=`Future shifts (${r.futureDates.map(fmtS).join(', ')}) cut safe hours: ${r.raw}h → ${r.safe}h.`;
+  }
+  else{abCls='ab-ok';abMsg=`Today has ${r.safe}h safe to book. Worst window: ${+r.worst.toFixed(1)}h / 24h.`;}
+
+  const sc=r.safe===0?'mc-coral':r.safe<4?'mc-amber':'mc-cyan';
+  const wc=r.worst>=24?'mc-coral':r.worst>=20?'mc-amber':'mc-white';
+
+  const allS=Object.entries(shifts).filter(([,e])=>e&&e.hours>0).sort((a,b)=>a[0].localeCompare(b[0]));
+  const chMap={completed:'ch-c',upcoming:'ch-u',amazon_cancelled_paid:'ch-p',cancelled:'ch-x',missed:'ch-x'};
+  const chLbl={completed:'done',upcoming:'booked',amazon_cancelled_paid:'paid cancel',cancelled:'excl',missed:'excl'};
+  const chips=allS.map(([d,e])=>
+    `<div class="chip ${chMap[e.status]||'ch-u'}">
+      <span>${fmtS(d)} ${fmtDow(d).slice(0,3)} · ${e.hours}h · ${chLbl[e.status]||e.status}</span>
+      <button onclick="delShift('${d}')" aria-label="Remove">×</button>
+    </div>`).join('');
+
+  document.getElementById('summary').innerHTML=`
+    <div class="summary-title">Live summary · ${fmtS(today)}</div>
+    <div class="alert-bar ${abCls}">${abMsg}</div>
+    <div class="cards">
+      <div class="mcard">
+        <div class="mc-lbl">Safe today</div>
+        <div class="mc-val ${sc}">${r.safe}h</div>
+        <div class="mc-sub">${r.safe===0?'Full · 0h':r.safe<4?'Limited':'Available'}</div>
+      </div>
+      <div class="mcard">
+        <div class="mc-lbl">Worst window</div>
+        <div class="mc-val ${wc}">${+r.worst.toFixed(1)}h</div>
+        <div class="mc-sub">of 24h cap</div>
+      </div>
+      <div class="mcard">
+        <div class="mc-lbl">Naive (back only)</div>
+        <div class="mc-val mc-white">${r.raw}h</div>
+        <div class="mc-sub">${r.blockedByFuture?'Cut by future':'Same as safe'}</div>
+      </div>
+      <div class="mcard">
+        <div class="mc-lbl">Future blocking</div>
+        <div class="mc-val ${r.blockedByFuture?'mc-amber':'mc-white'}">${r.blockedByFuture?'Yes':'No'}</div>
+        <div class="mc-sub">${r.futureDates.length?r.futureDates.map(fmtS).join(', '):'None'}</div>
+      </div>
+    </div>
+    <div class="win-title">7 overlapping windows · worst sets your limit</div>
+    <div class="win-grid">${(()=>{
+      // Find the single worst cell: only flag if total>0; on a tie, pick the last (T, index 6) as it's most relevant
+      const maxVal=r.worst;
+      const worstIdx=maxVal===0 ? -1 : r.wins.reduce((best,w,i)=>w.total===maxVal?i:best,-1);
+      return r.wins.map((w,i)=>{
+      const isW=i===worstIdx;
+      const offLabel=['T−6','T−5','T−4','T−3','T−2','T−1','T\u00a0(today)'][i];
+      const startShort=fmtS(w.start);
+      const endShort=fmtS(addD(w.start,6));
+      const pct=Math.min(100,(w.total/24)*100);
+      const col=w.total>=24?'#FF5F6D':w.total>=20?'#FFB347':'#00D4FF';
+      const safe=Math.max(0,+(24-w.total).toFixed(1));
+      const safeCol=safe===0?'#FF5F6D':safe<4?'#FFB347':'#00D4FF';
+      return`<div class="wg-cell${isW?' wg-worst':''}">
+        <div class="wg-off">${offLabel}</div>
+        <div class="wg-range">${startShort}<br/>${endShort}</div>
+        <div class="wg-hrs" style="color:${col};text-shadow:0 0 16px ${col}55">${+w.total.toFixed(1)}h</div>
+        <div class="wg-cap">/ 24h used</div>
+        <div class="wg-bar-wrap"><div class="wg-bar-fill" style="width:${pct}%;background:${col};box-shadow:0 0 5px ${col}66"></div></div>
+        ${isW
+          ?`<div class="wg-worst-tag">▲ worst</div>`
+          :`<div class="wg-safe-tag" style="color:${safeCol};background:${safeCol}1A">${safe}h free</div>`
+        }
+      </div>`;
+      }).join('');
+    })()}</div>
+    ${chips?`<div class="chips-wrap"><div class="win-title" style="margin-top:1.25rem">All shifts</div><div class="chips">${chips}</div></div>`
+      :`<div class="empty-msg" style="margin-top:1rem">No shifts entered — type hours directly on any day tile.</div>`}`;
+}
+
+window.delShift=function(d){
+  delete shifts[d];save();refreshPills();renderSummary();
+};
+
+/* ═══════ BUILD GRID ═══════ */
+function buildGrid(){
+  const today=getToday();
+  document.getElementById('datePill').textContent=fmtFull(today);
+
+  const rP=document.getElementById('rowPast');
+  const rT=document.getElementById('rowToday');
+  const rF=document.getElementById('rowFuture');
+  rP.innerHTML='';rT.innerHTML='';rF.innerHTML='';
+
+  for(let i=-6;i<=-1;i++){
+    const d=addD(today,i);
+    const t=makeSmallTile(d,false);
+    rP.appendChild(t);bindTile(t,d);
+  }
+  const tt=makeTodayTile(today);
+  rT.appendChild(tt);bindTile(tt,today);
+  for(let i=1;i<=6;i++){
+    const d=addD(today,i);
+    const t=makeSmallTile(d,false);
+    rF.appendChild(t);bindTile(t,d);
+  }
+  renderSummary();
+}
+
+buildGrid();
+(function midnight(){
+  const now=new Date();
+  const ms=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,5).getTime()-now.getTime();
+  setTimeout(()=>{buildGrid();midnight();},ms);
+})();
+
+/* ═══════ RESET ═══════ */
+function showToastSuccess(msg){
+  const t=document.getElementById('toast');
+  const icon=document.getElementById('toastIcon');
+  icon.innerHTML='<polyline points="20 6 9 17 4 12"/>';
+  t.classList.add('success');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{
+    t.classList.remove('show','success');
+    // restore error icon
+    setTimeout(()=>{icon.innerHTML='<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';},300);
+  },2800);
+}
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  document.getElementById('confirmOverlay').classList.add('open');
+});
+document.getElementById('confirmCancel').addEventListener('click',()=>{
+  document.getElementById('confirmOverlay').classList.remove('open');
+});
+document.getElementById('confirmOk').addEventListener('click',()=>{
+  document.getElementById('confirmOverlay').classList.remove('open');
+  shifts={};
+  save();
+  buildGrid();
+  showToastSuccess('All shifts cleared');
+});
+document.getElementById('confirmOverlay').addEventListener('click',function(e){
+  if(e.target===this)this.classList.remove('open');
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')document.getElementById('confirmOverlay').classList.remove('open');
+});
+</script>
+</body>
+</html>
