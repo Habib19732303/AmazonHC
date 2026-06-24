@@ -845,7 +845,7 @@ body{
 /* ═══════════════════════════ THREE-COLUMN LAYOUT ═══════════════════════════ */
 .app-shell{
   display:grid;
-  grid-template-columns:260px 1fr 260px;
+  grid-template-columns:320px 1fr 300px;
   gap:0;
   min-height:100vh;
   position:relative;z-index:1;
@@ -889,7 +889,7 @@ body{
 
 /* ═══════════════════════════ CALENDAR ═══════════════════════════ */
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.cal-month{font-size:14px;font-weight:700;color:var(--text);font-family:var(--mono);}
+.cal-month{font-size:16px;font-weight:700;color:var(--text);font-family:var(--mono);}
 .cal-arrow{
   background:none;border:none;cursor:pointer;color:var(--text3);
   font-size:16px;line-height:1;padding:4px 8px;border-radius:8px;
@@ -901,17 +901,18 @@ body{
   gap:3px;
 }
 .cal-dow{
-  font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-  color:var(--text3);text-align:center;padding:3px 0 5px;
+  font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text3);text-align:center;padding:4px 0 7px;
   font-family:var(--mono);
 }
 .cal-day{
-  aspect-ratio:1;border-radius:8px;
+  aspect-ratio:1;border-radius:10px;
   display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:600;font-family:var(--mono);
+  font-size:13px;font-weight:600;font-family:var(--mono);
   cursor:pointer;transition:transform .12s,box-shadow .12s;
   border:1px solid transparent;
   position:relative;
+  min-height:36px;
 }
 .cal-day:hover{transform:scale(1.12);}
 .cal-day.empty{cursor:default;pointer-events:none;}
@@ -979,20 +980,25 @@ body{
 .wx-error{text-align:center;padding:16px 0;color:var(--coral);font-size:11px;font-family:var(--mono);}
 
 /* ═══════════════════════════ RESPONSIVE PANELS ═══════════════════════════ */
-@media(max-width:1200px){
-  .app-shell{grid-template-columns:220px 1fr 220px;}
+@media(max-width:1400px){
+  .app-shell{grid-template-columns:300px 1fr 280px;}
 }
-@media(max-width:1024px){
+@media(max-width:1200px){
+  .app-shell{grid-template-columns:270px 1fr 250px;}
+}
+@media(max-width:1000px){
+  .app-shell{grid-template-columns:240px 1fr 220px;}
+  .cal-day{font-size:11px;min-height:30px;}
+}
+@media(max-width:820px){
   .app-shell{grid-template-columns:1fr;}
   .side-panel{position:static;height:auto;padding:0 1rem 1rem;}
   .app-shell > .side-panel:first-child{order:2;}
   .app-shell > .page{order:1;}
   .app-shell > .side-panel:last-child{order:3;}
-  /* show panels as horizontal scroll row on tablet */
-  .app-shell > .side-panel .panel-card{display:inline-block;min-width:260px;vertical-align:top;}
 }
 @media(max-width:600px){
-  .app-shell > .side-panel .panel-card{min-width:calc(100vw - 2rem);display:block;}
+  .app-shell > .side-panel .panel-card{display:block;}
 }
 </style>
 </head>
@@ -1083,7 +1089,6 @@ body{
   <div class="row-future" id="rowFuture"></div>
 
   <div class="summary" id="summary"></div>
-</div>
 </div><!-- end .page -->
 
 <!-- ═══ RIGHT: WEATHER ═══ -->
