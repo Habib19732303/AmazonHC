@@ -851,11 +851,11 @@ body{
   position:relative;z-index:1;
 }
 .side-panel{
-  padding:1.5rem 14px 4rem;
+  padding:1.5rem 20px 4rem 14px;
   position:sticky;top:0;
   height:100vh;
   overflow-y:auto;
-  overflow-x:hidden;
+  overflow-x:visible;
   scrollbar-width:thin;
   scrollbar-color:var(--glass-border) transparent;
 }
@@ -912,7 +912,7 @@ body{
   cursor:pointer;transition:transform .12s,box-shadow .12s;
   border:1px solid transparent;
   position:relative;
-  min-height:58px;
+  width:100%;
 }
 .cal-day:hover{transform:scale(1.1);}
 .cal-day.empty{cursor:default;pointer-events:none;}
@@ -998,7 +998,7 @@ body{
 }
 @media(max-width:600px){
   .app-shell > .side-panel .panel-card{display:block;}
-  .cal-day{min-height:42px;font-size:16px;}
+  .cal-day{font-size:16px;}
 }
 </style>
 </head>
