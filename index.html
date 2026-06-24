@@ -1119,6 +1119,10 @@ let shifts={};
 try{const s=localStorage.getItem('flexShiftsV3');if(s)shifts=JSON.parse(s);}catch(e){}
 function save(){try{localStorage.setItem('flexShiftsV3',JSON.stringify(shifts));}catch(e){}}
 
+let calYear=new Date().getFullYear();
+let calMonth=new Date().getMonth();
+const DAYS_SHORT=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
 function ds(d){
   const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
   return`${y}-${m}-${day}`;
@@ -1375,6 +1379,7 @@ function bindTile(tile,d){
     save();
     refreshPills();
     renderSummary();
+    renderCalendar();
     applyLockState();
 
     // After saving, re-lock any tiles that are now full
@@ -1547,6 +1552,7 @@ function buildGrid(){
     rF.appendChild(t);bindTile(t,d);
   }
   renderSummary();
+  renderCalendar();
 }
 
 buildGrid();
@@ -1592,10 +1598,6 @@ document.addEventListener('keydown',e=>{
 });
 
 /* ═══════ CALENDAR ═══════ */
-const DAYS_SHORT=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-let calYear=new Date().getFullYear();
-let calMonth=new Date().getMonth(); // 0-based
-
 function renderCalendar(){
   const today=getToday();
   const firstDay=new Date(calYear,calMonth,1);
@@ -1679,10 +1681,6 @@ document.getElementById('calPrev').addEventListener('click',()=>{
 document.getElementById('calNext').addEventListener('click',()=>{
   calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();
 });
-
-// Re-render calendar after any shift change (hook into save)
-const _origSave=save;
-function save(){_origSave();renderCalendar();}
 
 renderCalendar();
 
