@@ -841,6 +841,159 @@ body{
   .wg-cell:hover{transform:none;box-shadow:0 4px 16px rgba(0,0,0,0.3),inset 0 1px 0 var(--glass-highlight);}
   .reset-btn:hover{transform:none;}
 }
+
+/* ═══════════════════════════ THREE-COLUMN LAYOUT ═══════════════════════════ */
+.app-shell{
+  display:grid;
+  grid-template-columns:260px 1fr 260px;
+  gap:0;
+  min-height:100vh;
+  position:relative;z-index:1;
+}
+.side-panel{
+  padding:1.5rem 14px 4rem;
+  position:sticky;top:0;
+  height:100vh;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-color:var(--glass-border) transparent;
+}
+.side-panel::-webkit-scrollbar{width:4px;}
+.side-panel::-webkit-scrollbar-thumb{background:var(--glass-border);border-radius:2px;}
+
+/* ── PANEL CARD ── */
+.panel-card{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-top-color:var(--glass-highlight);
+  border-radius:var(--r-xl);
+  padding:16px;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  box-shadow:0 4px 24px var(--glass-shadow),inset 0 1px 0 var(--glass-highlight);
+  position:relative;overflow:hidden;
+  margin-bottom:12px;
+  transition:background .35s,border-color .35s;
+}
+.panel-card::before{
+  content:'';position:absolute;top:0;left:15%;width:70%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--glass-highlight),transparent);
+}
+.panel-title{
+  font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:12px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-title span{color:var(--text3);}
+
+/* ═══════════════════════════ CALENDAR ═══════════════════════════ */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cal-month{font-size:14px;font-weight:700;color:var(--text);font-family:var(--mono);}
+.cal-arrow{
+  background:none;border:none;cursor:pointer;color:var(--text3);
+  font-size:16px;line-height:1;padding:4px 8px;border-radius:8px;
+  transition:color .15s,background .15s;
+}
+.cal-arrow:hover{color:var(--accent);background:var(--accent-dim);}
+.cal-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  gap:3px;
+}
+.cal-dow{
+  font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text3);text-align:center;padding:3px 0 5px;
+  font-family:var(--mono);
+}
+.cal-day{
+  aspect-ratio:1;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:600;font-family:var(--mono);
+  cursor:pointer;transition:transform .12s,box-shadow .12s;
+  border:1px solid transparent;
+  position:relative;
+}
+.cal-day:hover{transform:scale(1.12);}
+.cal-day.empty{cursor:default;pointer-events:none;}
+.cal-day.cd-other{color:var(--text3);opacity:0.35;}
+.cal-day.cd-today{
+  border-color:var(--accent);
+  color:var(--accent);
+  box-shadow:0 0 8px var(--accent-glow);
+  font-weight:700;
+}
+.cal-day.cd-booked{background:var(--violet-dim);color:var(--violet);border-color:rgba(167,139,250,0.2);}
+.cal-day.cd-full{background:var(--coral-dim);color:var(--coral);border-color:rgba(255,95,109,0.2);}
+.cal-day.cd-lim{background:var(--amber-dim);color:var(--amber);border-color:rgba(255,179,71,0.2);}
+.cal-day.cd-avail{background:var(--gray-dim);color:var(--text2);}
+.cal-day.cd-past{opacity:0.5;}
+.cal-day.cd-selected{
+  box-shadow:0 0 0 2px var(--accent),0 0 12px var(--accent-glow);
+  transform:scale(1.1);
+}
+/* dot indicator */
+.cal-day.has-shift::after{
+  content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;
+  background:currentColor;opacity:.8;
+}
+
+/* Legend */
+.cal-legend{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
+.cal-leg-item{display:flex;align-items:center;gap:4px;font-size:8px;color:var(--text3);font-family:var(--mono);}
+.cal-leg-dot{width:8px;height:8px;border-radius:50%;}
+
+/* ═══════════════════════════ WEATHER ═══════════════════════════ */
+.wx-current{text-align:center;padding:8px 0 12px;}
+.wx-icon{font-size:48px;line-height:1;margin-bottom:4px;}
+.wx-temp{font-size:40px;font-weight:700;font-family:var(--mono);color:var(--text);line-height:1;}
+.wx-desc{font-size:12px;color:var(--text2);font-weight:500;margin-top:4px;text-transform:capitalize;}
+.wx-loc{font-size:9px;color:var(--text3);margin-top:2px;letter-spacing:.08em;text-transform:uppercase;font-family:var(--mono);}
+.wx-meta{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;
+  margin-top:12px;
+}
+.wx-meta-item{
+  background:var(--gray-dim);border-radius:10px;padding:8px;
+  text-align:center;
+}
+.wx-meta-label{font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);margin-bottom:3px;}
+.wx-meta-val{font-size:13px;font-weight:700;color:var(--text);font-family:var(--mono);}
+
+/* 7-day forecast */
+.wx-forecast{margin-top:12px;}
+.wx-fc-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 4px;border-bottom:1px solid var(--glass-border);
+  gap:4px;
+}
+.wx-fc-row:last-child{border-bottom:none;}
+.wx-fc-day{font-size:10px;font-weight:600;color:var(--text2);font-family:var(--mono);width:28px;flex-shrink:0;}
+.wx-fc-icon{font-size:16px;flex-shrink:0;}
+.wx-fc-bar-wrap{flex:1;height:4px;background:var(--gray-dim);border-radius:2px;overflow:hidden;margin:0 6px;}
+.wx-fc-bar{height:100%;border-radius:2px;background:var(--accent);opacity:0.6;}
+.wx-fc-temps{font-size:10px;font-family:var(--mono);color:var(--text2);white-space:nowrap;flex-shrink:0;}
+.wx-fc-temps b{color:var(--text);}
+.wx-updated{font-size:8px;color:var(--text3);text-align:center;margin-top:8px;font-family:var(--mono);}
+.wx-loading{text-align:center;padding:24px 0;color:var(--text3);font-size:12px;}
+.wx-error{text-align:center;padding:16px 0;color:var(--coral);font-size:11px;font-family:var(--mono);}
+
+/* ═══════════════════════════ RESPONSIVE PANELS ═══════════════════════════ */
+@media(max-width:1200px){
+  .app-shell{grid-template-columns:220px 1fr 220px;}
+}
+@media(max-width:1024px){
+  .app-shell{grid-template-columns:1fr;}
+  .side-panel{position:static;height:auto;padding:0 1rem 1rem;}
+  .app-shell > .side-panel:first-child{order:2;}
+  .app-shell > .page{order:1;}
+  .app-shell > .side-panel:last-child{order:3;}
+  /* show panels as horizontal scroll row on tablet */
+  .app-shell > .side-panel .panel-card{display:inline-block;min-width:260px;vertical-align:top;}
+}
+@media(max-width:600px){
+  .app-shell > .side-panel .panel-card{min-width:calc(100vw - 2rem);display:block;}
+}
 </style>
 </head>
 <body>
@@ -849,6 +1002,30 @@ body{
   <div class="aurora-blob"></div>
   <div class="aurora-blob"></div>
 </div>
+
+<div class="app-shell">
+
+<!-- ═══ LEFT: CALENDAR ═══ -->
+<aside class="side-panel" aria-label="Month calendar">
+  <div class="panel-card">
+    <div class="panel-title">
+      <span>Calendar</span>
+      <span id="calMonthBadge" style="color:var(--accent);font-size:9px;font-family:var(--mono);font-weight:700;"></span>
+    </div>
+    <div class="cal-nav">
+      <button class="cal-arrow" id="calPrev" aria-label="Previous month">&#8249;</button>
+      <div class="cal-month" id="calMonthLabel"></div>
+      <button class="cal-arrow" id="calNext" aria-label="Next month">&#8250;</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-legend">
+      <div class="cal-leg-item"><div class="cal-leg-dot" style="background:var(--violet)"></div>Booked</div>
+      <div class="cal-leg-item"><div class="cal-leg-dot" style="background:var(--coral)"></div>Full</div>
+      <div class="cal-leg-item"><div class="cal-leg-dot" style="background:var(--amber)"></div>Limited</div>
+      <div class="cal-leg-item"><div class="cal-leg-dot" style="background:var(--text3)"></div>Free</div>
+    </div>
+  </div>
+</aside>
 
 <div class="page">
   <div class="header">
@@ -907,6 +1084,20 @@ body{
 
   <div class="summary" id="summary"></div>
 </div>
+</div><!-- end .page -->
+
+<!-- ═══ RIGHT: WEATHER ═══ -->
+<aside class="side-panel" aria-label="Weather forecast">
+  <div class="panel-card">
+    <div class="panel-title"><span>Weather · Birmingham</span></div>
+    <div id="wxCurrent" class="wx-loading">Loading weather…</div>
+    <div id="wxForecast" class="wx-forecast"></div>
+    <div id="wxUpdated" class="wx-updated"></div>
+  </div>
+</aside>
+
+</div><!-- end .app-shell -->
+
 <div id="toast" role="alert" aria-live="assertive">
   <svg id="toastIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -1394,6 +1585,189 @@ document.getElementById('confirmOverlay').addEventListener('click',function(e){
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape')document.getElementById('confirmOverlay').classList.remove('open');
 });
+
+/* ═══════ CALENDAR ═══════ */
+const DAYS_SHORT=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+let calYear=new Date().getFullYear();
+let calMonth=new Date().getMonth(); // 0-based
+
+function renderCalendar(){
+  const today=getToday();
+  const firstDay=new Date(calYear,calMonth,1);
+  const lastDay=new Date(calYear,calMonth+1,0);
+  // Monday-first: 0=Mon..6=Sun
+  let startDow=(firstDay.getDay()+6)%7;
+  const totalCells=startDow+lastDay.getDate();
+  const rows=Math.ceil(totalCells/7);
+
+  const label=firstDay.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  document.getElementById('calMonthLabel').textContent=label;
+  // badge: how many shifts this month
+  const shiftsThisMonth=Object.keys(shifts).filter(d=>{
+    const dd=pd(d);return dd.getFullYear()===calYear&&dd.getMonth()===calMonth&&shifts[d]&&(shifts[d].hours||0)>0&&COUNTED(shifts[d].status);
+  }).length;
+  document.getElementById('calMonthBadge').textContent=shiftsThisMonth?shiftsThisMonth+'d booked':'';
+
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+
+  // Day-of-week headers
+  DAYS_SHORT.forEach(d=>{
+    const h=document.createElement('div');
+    h.className='cal-dow';h.textContent=d[0];
+    grid.appendChild(h);
+  });
+
+  // Empty cells before month start
+  for(let i=0;i<startDow;i++){
+    const e=document.createElement('div');e.className='cal-day empty';grid.appendChild(e);
+  }
+
+  // Day cells
+  for(let d=1;d<=lastDay.getDate();d++){
+    const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isPast=dateStr<today;
+    const isToday=dateStr===today;
+    const e=shifts[dateStr];
+    const hasShift=e&&(e.hours||0)>0;
+    const pc=pilClass(dateStr);
+
+    const cell=document.createElement('div');
+    let cls='cal-day';
+    if(isToday) cls+=' cd-today';
+    else if(isPast) cls+=' cd-past';
+
+    if(hasShift&&COUNTED(e.status)){
+      if(pc==='booked') cls+=' cd-booked';
+      else cls+=' cd-avail';
+    } else if(!isPast&&!isToday){
+      if(pc==='full') cls+=' cd-full';
+      else if(pc==='lim') cls+=' cd-lim';
+      else cls+=' cd-avail';
+    }
+    if(hasShift) cls+=' has-shift';
+    cell.className=cls;
+    cell.textContent=d;
+    cell.title=`${dateStr} · ${pc}`;
+
+    cell.addEventListener('click',()=>{
+      // Scroll to that tile in main grid if visible (±6 days from today)
+      const el=document.querySelector(`.dtile[data-d="${dateStr}"],.today-tile[data-d="${dateStr}"]`);
+      if(el){
+        el.scrollIntoView({behavior:'smooth',block:'center'});
+        el.style.outline=`2px solid var(--accent)`;
+        el.style.outlineOffset='3px';
+        setTimeout(()=>{el.style.outline='';el.style.outlineOffset='';},1800);
+      }
+      // Highlight selected
+      document.querySelectorAll('.cal-day.cd-selected').forEach(x=>x.classList.remove('cd-selected'));
+      cell.classList.add('cd-selected');
+    });
+
+    grid.appendChild(cell);
+  }
+}
+
+document.getElementById('calPrev').addEventListener('click',()=>{
+  calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();
+});
+document.getElementById('calNext').addEventListener('click',()=>{
+  calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();
+});
+
+// Re-render calendar after any shift change (hook into save)
+const _origSave=save;
+function save(){_origSave();renderCalendar();}
+
+renderCalendar();
+
+/* ═══════ WEATHER ═══════ */
+const WX_LAT=52.4862,WX_LON=-1.8904;
+const WMO_ICON={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',
+  45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌧️',
+  61:'🌧️',63:'🌧️',65:'🌧️',
+  71:'🌨️',73:'🌨️',75:'❄️',77:'❄️',
+  80:'🌦️',81:'🌧️',82:'⛈️',
+  85:'🌨️',86:'❄️',
+  95:'⛈️',96:'⛈️',99:'⛈️'};
+const WMO_DESC={0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',
+  45:'Fog',48:'Icy fog',
+  51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',
+  61:'Light rain',63:'Rain',65:'Heavy rain',
+  71:'Light snow',73:'Snow',75:'Heavy snow',77:'Snow grains',
+  80:'Showers',81:'Heavy showers',82:'Violent showers',
+  85:'Snow showers',86:'Heavy snow showers',
+  95:'Thunderstorm',96:'Thunderstorm+hail',99:'Thunderstorm+hail'};
+
+function wxIcon(code){return WMO_ICON[code]||'🌡️';}
+function wxDesc(code){return WMO_DESC[code]||'Unknown';}
+
+async function fetchWeather(){
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${WX_LAT}&longitude=${WX_LON}`
+    +`&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,apparent_temperature`
+    +`&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max`
+    +`&timezone=Europe%2FLondon&forecast_days=7&wind_speed_unit=mph`;
+  try{
+    const res=await fetch(url);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    renderWeather(data);
+    const now=new Date();
+    document.getElementById('wxUpdated').textContent=
+      'Updated '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){
+    document.getElementById('wxCurrent').innerHTML=
+      `<div class="wx-error">⚠ Could not load weather<br><small>${e.message}</small></div>`;
+  }
+}
+
+function renderWeather(data){
+  const c=data.current;
+  const temp=Math.round(c.temperature_2m);
+  const feel=Math.round(c.apparent_temperature);
+  const code=c.weather_code;
+  const hum=c.relative_humidity_2m;
+  const wind=Math.round(c.wind_speed_10m);
+
+  document.getElementById('wxCurrent').innerHTML=`
+    <div class="wx-current">
+      <div class="wx-icon">${wxIcon(code)}</div>
+      <div class="wx-temp">${temp}°C</div>
+      <div class="wx-desc">${wxDesc(code)}</div>
+      <div class="wx-loc">📍 Birmingham, UK</div>
+    </div>
+    <div class="wx-meta">
+      <div class="wx-meta-item"><div class="wx-meta-label">Feels like</div><div class="wx-meta-val">${feel}°</div></div>
+      <div class="wx-meta-item"><div class="wx-meta-label">Humidity</div><div class="wx-meta-val">${hum}%</div></div>
+      <div class="wx-meta-item"><div class="wx-meta-label">Wind</div><div class="wx-meta-val">${wind}mph</div></div>
+      <div class="wx-meta-item"><div class="wx-meta-label">Condition</div><div class="wx-meta-val" style="font-size:10px">${wxDesc(code).split(' ')[0]}</div></div>
+    </div>`;
+
+  // 7-day forecast
+  const d=data.daily;
+  const allMax=d.temperature_2m_max;
+  const absMax=Math.max(...allMax);const absMin=Math.min(...d.temperature_2m_min);
+  const range=absMax-absMin||1;
+
+  const fcHtml=d.time.map((dateStr,i)=>{
+    const dow=i===0?'Today':pd(dateStr).toLocaleDateString('en-GB',{weekday:'short'});
+    const icon=wxIcon(d.weather_code[i]);
+    const hi=Math.round(d.temperature_2m_max[i]);
+    const lo=Math.round(d.temperature_2m_min[i]);
+    const pct=Math.round(((hi-absMin)/range)*100);
+    return`<div class="wx-fc-row">
+      <div class="wx-fc-day">${dow}</div>
+      <div class="wx-fc-icon">${icon}</div>
+      <div class="wx-fc-bar-wrap"><div class="wx-fc-bar" style="width:${pct}%"></div></div>
+      <div class="wx-fc-temps"><b>${hi}°</b> <span style="opacity:.5">${lo}°</span></div>
+    </div>`;
+  }).join('');
+  document.getElementById('wxForecast').innerHTML=fcHtml;
+}
+
+fetchWeather();
+setInterval(fetchWeather,10*60*1000); // refresh every 10 min
 
 /* ═══════ THEME SWITCHER ═══════ */
 const THEME_KEY='flexThemeV1';
