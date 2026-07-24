@@ -601,6 +601,102 @@ body{
 .chip button:hover{opacity:1;}
 .empty-msg{font-size:12px;color:var(--text3);padding:8px 0;font-style:italic;}
 
+/* ═══════════════════════════ IMPORT BUTTON ═══════════════════════════ */
+.import-btn{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(0,212,255,0.08);
+  border:1px solid rgba(0,212,255,0.3);
+  border-top-color:rgba(0,212,255,0.5);
+  border-radius:40px;
+  padding:7px 16px;
+  font-size:12px;font-weight:600;
+  color:var(--cyan);
+  font-family:var(--sans);
+  cursor:pointer;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:0 2px 12px rgba(0,212,255,0.1),inset 0 1px 0 rgba(0,212,255,0.2);
+  transition:background .15s,box-shadow .15s,transform .12s;
+  letter-spacing:.02em;
+}
+.import-btn:hover{
+  background:rgba(0,212,255,0.15);
+  box-shadow:0 4px 20px rgba(0,212,255,0.22),inset 0 1px 0 rgba(0,212,255,0.3);
+  transform:translateY(-1px);
+}
+.import-btn:active{transform:scale(0.97);}
+
+/* Import modal */
+.import-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(4,6,18,0.75);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease;
+}
+.import-overlay.open{opacity:1;pointer-events:all;}
+.import-box{
+  background:rgba(12,16,36,0.95);
+  border:1px solid rgba(0,212,255,0.25);
+  border-top-color:rgba(0,212,255,0.5);
+  border-radius:24px;
+  padding:28px 28px 24px;
+  max-width:420px;width:92%;
+  box-shadow:0 24px 80px rgba(0,0,0,0.7),0 0 60px rgba(0,212,255,0.06);
+  animation:popUp .22s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+}
+.import-box::before{
+  content:'';position:absolute;top:0;left:15%;width:70%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,212,255,0.5),transparent);
+}
+.import-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.import-sub{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:18px;}
+.import-format{
+  background:rgba(0,212,255,0.06);
+  border:1px solid rgba(0,212,255,0.15);
+  border-radius:12px;padding:12px 14px;
+  font-family:var(--mono);font-size:11px;
+  color:var(--text2);line-height:1.8;
+  margin-bottom:16px;
+}
+.import-format b{color:var(--cyan);}
+.drop-zone{
+  border:2px dashed rgba(0,212,255,0.25);
+  border-radius:16px;
+  padding:28px;
+  text-align:center;
+  cursor:pointer;
+  transition:border-color .2s,background .2s;
+  margin-bottom:14px;
+}
+.drop-zone:hover,.drop-zone.drag-over{
+  border-color:rgba(0,212,255,0.6);
+  background:rgba(0,212,255,0.05);
+}
+.drop-zone-icon{font-size:32px;margin-bottom:8px;}
+.drop-zone-txt{font-size:13px;color:var(--text2);font-weight:500;}
+.drop-zone-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+.import-result{
+  font-size:12px;font-family:var(--mono);
+  padding:10px 14px;border-radius:10px;
+  margin-bottom:14px;display:none;line-height:1.7;
+}
+.import-result.ok{background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);color:var(--cyan);}
+.import-result.err{background:rgba(255,95,109,0.08);border:1px solid rgba(255,95,109,0.2);color:var(--coral);}
+.import-actions{display:flex;gap:10px;justify-content:flex-end;}
+.import-cancel{
+  padding:9px 18px;border-radius:12px;font-size:13px;font-weight:600;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  color:var(--text2);cursor:pointer;font-family:var(--sans);
+}
+.import-cancel:hover{background:rgba(255,255,255,0.1);}
+.tpl-link{
+  font-size:11px;color:var(--text3);text-align:center;
+  margin-bottom:14px;font-family:var(--mono);
+}
+.tpl-link a{color:var(--cyan);cursor:pointer;text-decoration:underline;}
+
 /* ═══════════════════════════ RESET BUTTON ═══════════════════════════ */
 .reset-btn{
   display:flex;align-items:center;gap:6px;
@@ -1049,6 +1145,10 @@ body{
         <button class="theme-btn" data-t="arctic" title="Arctic" aria-label="Arctic theme"></button>
       </div>
       <div class="date-pill" id="datePill"></div>
+      <button id="importBtn" class="import-btn" aria-label="Import CSV">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Import CSV
+      </button>
       <button id="resetBtn" class="reset-btn" aria-label="Reset all shifts">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         Reset
@@ -1071,6 +1171,34 @@ body{
       <div class="confirm-actions">
         <button id="confirmCancel" class="confirm-btn confirm-cancel">Cancel</button>
         <button id="confirmOk" class="confirm-btn confirm-ok">Yes, reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div id="importOverlay" class="import-overlay" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+    <div class="import-box">
+      <div class="import-title" id="importTitle">📂 Import Shifts from CSV</div>
+      <div class="import-sub">Keep a CSV of all your regular shifts. On import the app reads every row, matches dates to today's window, and fills in your hours automatically.</div>
+      <div class="import-format">
+        <b>Required columns (any order):</b><br>
+        Date &nbsp;· &nbsp;Hours &nbsp;· &nbsp;Status <i style="opacity:.5">(optional)</i><br><br>
+        <b>Date formats accepted:</b><br>
+        DD/MM/YYYY &nbsp;· &nbsp;YYYY-MM-DD &nbsp;· &nbsp;DD-MM-YYYY<br><br>
+        <b>Status values:</b><br>
+        upcoming &nbsp;· &nbsp;completed &nbsp;· &nbsp;amazon_cancelled_paid<br>
+        cancelled &nbsp;· &nbsp;missed
+      </div>
+      <div class="tpl-link">Need a template? <a id="downloadTpl">Download sample CSV</a></div>
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-icon">📄</div>
+        <div class="drop-zone-txt">Drop your CSV here or click to browse</div>
+        <div class="drop-zone-sub">Supports .csv files</div>
+        <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none"/>
+      </div>
+      <div class="import-result" id="importResult"></div>
+      <div class="import-actions">
+        <button class="import-cancel" id="importCancel">Close</button>
       </div>
     </div>
   </div>
@@ -1771,6 +1899,158 @@ function renderWeather(data){
 
 fetchWeather();
 setInterval(fetchWeather,10*60*1000); // refresh every 10 min
+
+/* ═══════ CSV IMPORT ═══════ */
+function parseDate(str){
+  if(!str)return null;
+  str=str.trim();
+  // YYYY-MM-DD
+  if(/^\d{4}-\d{2}-\d{2}$/.test(str))return str;
+  // DD/MM/YYYY or DD-MM-YYYY
+  const m=str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if(m)return`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  // MM/DD/YYYY
+  const m2=str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m2){
+    // ambiguous — try DD/MM first (UK), already handled above
+    return null;
+  }
+  return null;
+}
+
+function parseCSV(text){
+  const lines=text.trim().split(/\r?\n/);
+  if(lines.length<2)return{error:'File appears empty or has no data rows.'};
+
+  // detect headers
+  const rawHeaders=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/"/g,''));
+  const colDate=rawHeaders.findIndex(h=>h.includes('date'));
+  const colHours=rawHeaders.findIndex(h=>h.includes('hour'));
+  const colStatus=rawHeaders.findIndex(h=>h.includes('status'));
+
+  if(colDate===-1)return{error:'No "Date" column found. Check your CSV headers.'};
+  if(colHours===-1)return{error:'No "Hours" column found. Check your CSV headers.'};
+
+  const today=getToday();
+  const windowStart=addD(today,-6);
+  const windowEnd=addD(today,6);
+
+  let imported=0,skipped=0,outOfWindow=0;
+  const newShifts={};
+
+  for(let i=1;i<lines.length;i++){
+    const line=lines[i].trim();
+    if(!line)continue;
+    // handle quoted fields
+    const cols=line.split(',').map(c=>c.trim().replace(/^"|"$/g,''));
+    const rawDate=cols[colDate]||'';
+    const rawHours=cols[colHours]||'';
+    const rawStatus=cols[colStatus]||'upcoming';
+
+    const dateStr=parseDate(rawDate);
+    const hrs=parseFloat(rawHours);
+
+    if(!dateStr){skipped++;continue;}
+    if(isNaN(hrs)||hrs<0||hrs>12){skipped++;continue;}
+
+    // only import dates within 13-day window
+    if(dateStr<windowStart||dateStr>windowEnd){outOfWindow++;continue;}
+
+    const validStatuses=['upcoming','completed','amazon_cancelled_paid','cancelled','missed'];
+    const status=validStatuses.includes(rawStatus.trim().toLowerCase())?rawStatus.trim().toLowerCase():'upcoming';
+
+    if(hrs>0){
+      newShifts[dateStr]={hours:hrs,status};
+      imported++;
+    }
+  }
+
+  return{newShifts,imported,skipped,outOfWindow};
+}
+
+function applyImport(result){
+  const el=document.getElementById('importResult');
+  if(result.error){
+    el.className='import-result err';
+    el.style.display='block';
+    el.textContent='⚠ '+result.error;
+    return;
+  }
+  // merge imported shifts into existing
+  Object.assign(shifts,result.newShifts);
+  save();
+  buildGrid();
+
+  el.className='import-result ok';
+  el.style.display='block';
+  el.innerHTML=
+    `✓ Imported <b>${result.imported}</b> shift${result.imported!==1?'s':''} into the current window`+
+    (result.skipped?`<br>⚠ ${result.skipped} row${result.skipped!==1?'s':''} skipped (bad date/hours)`:'')  +
+    (result.outOfWindow?`<br>📅 ${result.outOfWindow} row${result.outOfWindow!==1?'s':''} outside the 13-day window (ignored)`:'');
+}
+
+// Modal open/close
+document.getElementById('importBtn').addEventListener('click',()=>{
+  document.getElementById('importResult').style.display='none';
+  document.getElementById('importOverlay').classList.add('open');
+});
+document.getElementById('importCancel').addEventListener('click',()=>{
+  document.getElementById('importOverlay').classList.remove('open');
+});
+document.getElementById('importOverlay').addEventListener('click',function(e){
+  if(e.target===this)this.classList.remove('open');
+});
+
+// File input via click on drop zone
+const dropZone=document.getElementById('dropZone');
+const csvInput=document.getElementById('csvFileInput');
+dropZone.addEventListener('click',()=>csvInput.click());
+csvInput.addEventListener('change',e=>{
+  const file=e.target.files[0];
+  if(file)readFile(file);
+  csvInput.value='';
+});
+
+// Drag and drop
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop',e=>{
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file=e.dataTransfer.files[0];
+  if(file)readFile(file);
+});
+
+function readFile(file){
+  if(!file.name.match(/\.csv$/i)){
+    const el=document.getElementById('importResult');
+    el.className='import-result err';
+    el.style.display='block';
+    el.textContent='⚠ Please upload a .csv file.';
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=e=>applyImport(parseCSV(e.target.result));
+  reader.readAsText(file);
+}
+
+// Download sample CSV template
+document.getElementById('downloadTpl').addEventListener('click',()=>{
+  const today=getToday();
+  const rows=[
+    'Date,Hours,Status',
+    `${fmtS(addD(today,-2)).replace(' ','/').split('/').reverse().join('/')},4,completed`,
+    `${fmtS(addD(today,-1)).replace(' ','/').split('/').reverse().join('/')},3.5,completed`,
+    `${fmtS(today).replace(' ','/').split('/').reverse().join('/')},4,upcoming`,
+    `${fmtS(addD(today,1)).replace(' ','/').split('/').reverse().join('/')},4,upcoming`,
+    `${fmtS(addD(today,3)).replace(' ','/').split('/').reverse().join('/')},5,upcoming`,
+  ].join('\n');
+  const blob=new Blob([rows],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='flex_shifts_template.csv';
+  a.click();
+});
 
 /* ═══════ THEME SWITCHER ═══════ */
 const THEME_KEY='flexThemeV1';
