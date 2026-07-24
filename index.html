@@ -1179,15 +1179,13 @@ body{
   <div id="importOverlay" class="import-overlay" role="dialog" aria-modal="true" aria-labelledby="importTitle">
     <div class="import-box">
       <div class="import-title" id="importTitle">📂 Import Shifts from CSV</div>
-      <div class="import-sub">Keep a CSV of all your regular shifts. On import the app reads every row, matches dates to today's window, and fills in your hours automatically.</div>
+      <div class="import-sub">Keep a simple CSV of your shifts. Just two columns — Date and Hours. Import anytime and the app fills in your current window automatically.</div>
       <div class="import-format">
-        <b>Required columns (any order):</b><br>
-        Date &nbsp;· &nbsp;Hours &nbsp;· &nbsp;Status <i style="opacity:.5">(optional)</i><br><br>
-        <b>Date formats accepted:</b><br>
-        DD/MM/YYYY &nbsp;· &nbsp;YYYY-MM-DD &nbsp;· &nbsp;DD-MM-YYYY<br><br>
-        <b>Status values:</b><br>
-        upcoming &nbsp;· &nbsp;completed &nbsp;· &nbsp;amazon_cancelled_paid<br>
-        cancelled &nbsp;· &nbsp;missed
+        <b>Date,Hours</b><br>
+        24/06/2026,4<br>
+        25/06/2026,3.5<br>
+        27/06/2026,4<br>
+        <span style="opacity:.5">— DD/MM/YYYY or YYYY-MM-DD accepted —</span>
       </div>
       <div class="tpl-link">Need a template? <a id="downloadTpl">Download sample CSV</a></div>
       <div class="drop-zone" id="dropZone">
@@ -1919,18 +1917,10 @@ function parseDate(str){
 }
 
 function parseCSV(text){
-  const lines=text.trim().split(/\r?\n/);
-  if(lines.length<2)return{error:'File appears empty or has no data rows.'};
+  const lines=text.trim().split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length<2)return{error:'File is empty or has no data rows.'};
 
-  // detect headers
-  const rawHeaders=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/"/g,''));
-  const colDate=rawHeaders.findIndex(h=>h.includes('date'));
-  const colHours=rawHeaders.findIndex(h=>h.includes('hour'));
-  const colStatus=rawHeaders.findIndex(h=>h.includes('status'));
-
-  if(colDate===-1)return{error:'No "Date" column found. Check your CSV headers.'};
-  if(colHours===-1)return{error:'No "Hours" column found. Check your CSV headers.'};
-
+  // first line = header, skip it
   const today=getToday();
   const windowStart=addD(today,-6);
   const windowEnd=addD(today,6);
@@ -1939,30 +1929,15 @@ function parseCSV(text){
   const newShifts={};
 
   for(let i=1;i<lines.length;i++){
-    const line=lines[i].trim();
-    if(!line)continue;
-    // handle quoted fields
-    const cols=line.split(',').map(c=>c.trim().replace(/^"|"$/g,''));
-    const rawDate=cols[colDate]||'';
-    const rawHours=cols[colHours]||'';
-    const rawStatus=cols[colStatus]||'upcoming';
+    const cols=lines[i].split(',').map(c=>c.trim().replace(/^"|"$/g,''));
+    const dateStr=parseDate(cols[0]);
+    const hrs=parseFloat(cols[1]);
 
-    const dateStr=parseDate(rawDate);
-    const hrs=parseFloat(rawHours);
-
-    if(!dateStr){skipped++;continue;}
-    if(isNaN(hrs)||hrs<0||hrs>12){skipped++;continue;}
-
-    // only import dates within 13-day window
+    if(!dateStr||isNaN(hrs)||hrs<=0||hrs>12){skipped++;continue;}
     if(dateStr<windowStart||dateStr>windowEnd){outOfWindow++;continue;}
 
-    const validStatuses=['upcoming','completed','amazon_cancelled_paid','cancelled','missed'];
-    const status=validStatuses.includes(rawStatus.trim().toLowerCase())?rawStatus.trim().toLowerCase():'upcoming';
-
-    if(hrs>0){
-      newShifts[dateStr]={hours:hrs,status};
-      imported++;
-    }
+    newShifts[dateStr]={hours:hrs,status:'upcoming'};
+    imported++;
   }
 
   return{newShifts,imported,skipped,outOfWindow};
@@ -2037,13 +2012,14 @@ function readFile(file){
 // Download sample CSV template
 document.getElementById('downloadTpl').addEventListener('click',()=>{
   const today=getToday();
+  const fmt=d=>pd(d).toLocaleDateString('en-GB').replace(/\//g,'/');
   const rows=[
-    'Date,Hours,Status',
-    `${fmtS(addD(today,-2)).replace(' ','/').split('/').reverse().join('/')},4,completed`,
-    `${fmtS(addD(today,-1)).replace(' ','/').split('/').reverse().join('/')},3.5,completed`,
-    `${fmtS(today).replace(' ','/').split('/').reverse().join('/')},4,upcoming`,
-    `${fmtS(addD(today,1)).replace(' ','/').split('/').reverse().join('/')},4,upcoming`,
-    `${fmtS(addD(today,3)).replace(' ','/').split('/').reverse().join('/')},5,upcoming`,
+    'Date,Hours',
+    `${fmt(addD(today,-2))},4`,
+    `${fmt(addD(today,-1))},3.5`,
+    `${fmt(today)},4`,
+    `${fmt(addD(today,1))},4`,
+    `${fmt(addD(today,3))},5`,
   ].join('\n');
   const blob=new Blob([rows],{type:'text/csv'});
   const a=document.createElement('a');
