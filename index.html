@@ -1920,27 +1920,42 @@ function parseCSV(text){
   const lines=text.trim().split(/\r?\n/).filter(l=>l.trim());
   if(lines.length<2)return{error:'File is empty or has no data rows.'};
 
-  // first line = header, skip it
   const today=getToday();
   const windowStart=addD(today,-6);
   const windowEnd=addD(today,6);
 
   let imported=0,skipped=0,outOfWindow=0;
+  const blocked=[]; // {date, hrs, worstAfter}
   const newShifts={};
 
+  // Process rows in date order so earlier shifts don't block later ones unfairly
+  const rows=[];
   for(let i=1;i<lines.length;i++){
     const cols=lines[i].split(',').map(c=>c.trim().replace(/^"|"$/g,''));
     const dateStr=parseDate(cols[0]);
     const hrs=parseFloat(cols[1]);
-
     if(!dateStr||isNaN(hrs)||hrs<=0||hrs>12){skipped++;continue;}
     if(dateStr<windowStart||dateStr>windowEnd){outOfWindow++;continue;}
+    rows.push({dateStr,hrs});
+  }
+  rows.sort((a,b)=>a.dateStr.localeCompare(b.dateStr));
 
-    newShifts[dateStr]={hours:hrs,status:'upcoming'};
-    imported++;
+  for(const {dateStr,hrs} of rows){
+    // Simulate adding this row on top of existing shifts + already-accepted imports
+    const sim=calcIfAdd(dateStr,hrs,'upcoming');
+    if(sim.worst>24){
+      const worstAfter=+sim.worst.toFixed(1);
+      const maxSafe=Math.max(0,+(24-(sim.worst-hrs)).toFixed(1));
+      blocked.push({date:fmtS(dateStr),hrs,worstAfter,maxSafe});
+    } else {
+      // Safe — tentatively apply to shifts so subsequent rows see accurate state
+      shifts[dateStr]={hours:hrs,status:'upcoming'};
+      newShifts[dateStr]={hours:hrs,status:'upcoming'};
+      imported++;
+    }
   }
 
-  return{newShifts,imported,skipped,outOfWindow};
+  return{newShifts,imported,skipped,outOfWindow,blocked};
 }
 
 function applyImport(result){
@@ -1951,17 +1966,31 @@ function applyImport(result){
     el.textContent='⚠ '+result.error;
     return;
   }
-  // merge imported shifts into existing
-  Object.assign(shifts,result.newShifts);
+
+  // newShifts already applied to shifts during parse — just save & rebuild
   save();
   buildGrid();
 
-  el.className='import-result ok';
+  const hasIssues=result.skipped||result.outOfWindow||result.blocked.length;
+  el.className='import-result '+(result.imported>0?'ok':'err');
   el.style.display='block';
-  el.innerHTML=
-    `✓ Imported <b>${result.imported}</b> shift${result.imported!==1?'s':''} into the current window`+
-    (result.skipped?`<br>⚠ ${result.skipped} row${result.skipped!==1?'s':''} skipped (bad date/hours)`:'')  +
-    (result.outOfWindow?`<br>📅 ${result.outOfWindow} row${result.outOfWindow!==1?'s':''} outside the 13-day window (ignored)`:'');
+
+  let html='';
+  if(result.imported>0)
+    html+=`✓ <b>${result.imported}</b> shift${result.imported!==1?'s':''} imported successfully<br>`;
+  if(result.blocked.length){
+    html+=`<br>🚫 <b>${result.blocked.length}</b> row${result.blocked.length!==1?'s':''} blocked — would exceed 24h cap:<br>`;
+    result.blocked.forEach(b=>{
+      html+=`&nbsp;· ${b.date}: ${b.hrs}h rejected (window would hit ${b.worstAfter}h · max safe: ${b.maxSafe}h)<br>`;
+    });
+  }
+  if(result.skipped)
+    html+=`<br>⚠ ${result.skipped} row${result.skipped!==1?'s':''} skipped (unreadable date or invalid hours)`;
+  if(result.outOfWindow)
+    html+=`<br>📅 ${result.outOfWindow} row${result.outOfWindow!==1?'s':''} outside the 13-day window (ignored)`;
+
+  if(!result.imported&&!hasIssues) html='No matching rows found for the current window.';
+  el.innerHTML=html;
 }
 
 // Modal open/close
