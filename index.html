@@ -1228,9 +1228,14 @@ body{
 
 /* ═══════════════════════════ CAL DELIVERY SCENE ═══════════════════════════ */
 .cal-delivery{margin:12px 0 0;border-radius:16px;overflow:hidden;border:1px solid rgba(255,179,71,0.2);position:relative;}
-.cd-label{display:flex;align-items:center;gap:6px;font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);padding:6px 12px 8px;background:rgba(0,0,0,0.3);}
+.cd-label{display:flex;align-items:center;gap:6px;font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);padding:6px 12px 4px;background:rgba(0,0,0,0.3);}
 .cd-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#FF9900;box-shadow:0 0 8px #FF9900;animation:cdDot 1.2s ease-in-out infinite alternate;}
 @keyframes cdDot{from{opacity:.4;}to{opacity:1;box-shadow:0 0 14px #FF9900;}}
+.cd-counter{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.cd-count-txt{font-size:11px;font-weight:900;color:#FF9900;letter-spacing:.05em;transition:color .3s,transform .3s;display:inline-block;}
+.cd-count-txt span{color:#fff;opacity:.5;}
+.cd-prog-wrap{width:80px;height:5px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;}
+.cd-prog-bar{height:100%;width:0%;background:linear-gradient(90deg,#FF9900,#FFD700);border-radius:3px;transition:width .4s ease;}
 
 .cd-scene{position:relative;height:140px;overflow:hidden;}
 
@@ -1510,7 +1515,13 @@ body{
       <div class="cd-spark s2">✦</div>
       <div class="cd-spark s3">★</div>
     </div>
-    <div class="cd-label"><span class="cd-dot"></span>Amazon Flex Driver</div>
+    <div class="cd-label">
+      <span class="cd-dot"></span>Amazon Flex Driver
+      <div class="cd-counter">
+        <span class="cd-count-txt" id="cdCountTxt">1<span>/48</span></span>
+        <div class="cd-prog-wrap"><div class="cd-prog-bar" id="cdProgBar"></div></div>
+      </div>
+    </div>
   </div>
 </aside>
 
@@ -2720,6 +2731,28 @@ document.querySelectorAll('.theme-btn').forEach(b=>{
     showToastSuccess('Theme: '+themeNames[b.dataset.t]);
   });
 });
+
+/* ═══════ DELIVERY COUNTER ═══════ */
+(function(){
+  const TOTAL=48;
+  const CYCLE_MS=5000; // matches personWalk animation duration
+  let count=1;
+  const txtEl=document.getElementById('cdCountTxt');
+  const barEl=document.getElementById('cdProgBar');
+  function update(){
+    if(!txtEl||!barEl)return;
+    txtEl.innerHTML=`${count}<span>/${TOTAL}</span>`;
+    barEl.style.width=((count/TOTAL)*100)+'%';
+    // Flash the number
+    txtEl.style.transform='scale(1.3)';
+    txtEl.style.color='#FFD700';
+    setTimeout(()=>{txtEl.style.transform='';txtEl.style.color='';},300);
+    count=count<TOTAL?count+1:1;
+  }
+  update();
+  // Increment once per animation cycle (at ~57% = delivery moment ~2.85s in)
+  setInterval(update, CYCLE_MS);
+})();
 </script>
 </body>
 </html>
