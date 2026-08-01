@@ -593,9 +593,9 @@ body{
 .aw-day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:7px;}
 .aw-day-cell{
   border-radius:10px;padding:7px 4px 6px;text-align:center;position:relative;overflow:hidden;
-  background:linear-gradient(160deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%);
-  border:1px solid rgba(255,255,255,0.1);
-  box-shadow:0 3px 12px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.07);
+  background:linear-gradient(160deg,rgba(255,255,255,0.08) 0%,rgba(10,15,30,0.6) 100%);
+  border:1px solid rgba(255,255,255,0.14);
+  box-shadow:0 3px 14px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.1);
   transition:transform .15s,box-shadow .15s;
 }
 .aw-day-cell::before{content:'';position:absolute;top:0;left:10%;width:80%;height:1px;
@@ -607,13 +607,13 @@ body{
 .aw-day-cell.awd-future{opacity:0.4;}
 .aw-day-cell.awd-booked{border-color:rgba(0,212,255,0.35);background:linear-gradient(160deg,rgba(0,212,255,0.08) 0%,rgba(0,212,255,0.02) 100%);}
 .aw-day-cell.awd-booked.awd-heavy{border-color:rgba(255,95,109,0.4);background:linear-gradient(160deg,rgba(255,95,109,0.09) 0%,rgba(255,95,109,0.02) 100%);}
-.awd-dow{font-size:7px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:1px;}
-.awd-date{font-size:9px;font-weight:700;color:var(--text2);font-family:var(--mono);margin-bottom:5px;}
-.awd-big-hrs{font-size:20px;font-weight:800;font-family:var(--mono);line-height:1;margin-bottom:0;}
-.awd-cap-row{font-size:8px;color:var(--text3);font-family:var(--mono);letter-spacing:.02em;margin-bottom:4px;}
-.awd-cap-row b{color:var(--text2);font-weight:700;}
-.awd-status{display:inline-block;font-size:6px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:1px 5px;border-radius:3px;font-family:var(--mono);}
-.awd-bar-wrap{margin:5px 2px 0;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;}
+.awd-dow{font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.75);font-family:var(--mono);margin-bottom:2px;}
+.awd-date{font-size:11px;font-weight:800;color:rgba(255,255,255,0.95);font-family:var(--mono);margin-bottom:6px;text-shadow:0 0 8px rgba(255,255,255,0.2);}
+.awd-big-hrs{font-size:22px;font-weight:900;font-family:var(--mono);line-height:1;margin-bottom:1px;letter-spacing:-.01em;}
+.awd-cap-row{font-size:9px;color:rgba(255,255,255,0.5);font-family:var(--mono);letter-spacing:.02em;margin-bottom:4px;}
+.awd-cap-row b{font-weight:800;}
+.awd-status{display:inline-block;font-size:7px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;padding:2px 6px;border-radius:4px;font-family:var(--mono);}
+.awd-bar-wrap{margin:5px 2px 0;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;}
 .awd-bar-fill{height:100%;border-radius:2px;transition:width .4s ease;}
 .awd-glow-line{position:absolute;bottom:0;left:0;right:0;height:2px;border-radius:0 0 10px 10px;}
 
@@ -1727,7 +1727,7 @@ function renderSummary(){
         const isPast=dStr<today;
         const isToday=dStr===today;
         const isFuture=dStr>today;
-        const col=hrs===0?(isPast?'#555':'var(--text3)'):hrs>=8?'#FF5F6D':hrs>=6?'#FFB347':'#00D4FF';
+        const col=hrs===0?(isPast?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.2)'):hrs>=8?'#FF5F6D':hrs>=6?'#FFB347':'#00D4FF';
         const cumCol=runTotal>=24?'#FF5F6D':runTotal>=20?'#FFB347':'#00E676';
         const pctBar=Math.min(100,(runTotal/24)*100);
         let cellCls='aw-day-cell';
@@ -1745,8 +1745,8 @@ function renderSummary(){
         return`<div class="${cellCls}">
           <div class="awd-dow">${dowLbl}</div>
           <div class="awd-date">${dateNum} ${monLbl}</div>
-          <div class="awd-big-hrs" style="color:${col};text-shadow:0 0 16px ${col}66">${hrs>0?hrs+'h':'—'}</div>
-          <div class="awd-cap-row"><b style="color:${cumCol}">${runTotal}h</b> / 24h</div>
+          <div class="awd-big-hrs" style="color:${col};text-shadow:0 0 20px ${col},0 0 40px ${col}55">${hrs>0?hrs+'h':'—'}</div>
+          <div class="awd-cap-row"><b style="color:${cumCol};text-shadow:0 0 10px ${cumCol}88">${runTotal}h</b> / 24h</div>
           <div class="awd-status" style="background:${statusBg};color:${statusFg}">${statusTxt}</div>
           <div class="awd-bar-wrap"><div class="awd-bar-fill" style="width:${pctBar}%;background:${cumCol};box-shadow:0 0 5px ${cumCol}88"></div></div>
           <div class="awd-glow-line" style="background:linear-gradient(90deg,transparent,${col}44,transparent)"></div>
