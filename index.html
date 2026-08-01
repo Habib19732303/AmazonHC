@@ -574,6 +574,14 @@ body{
 .wg-cap{font-size:9px;color:var(--text3);font-family:var(--mono);}
 .wg-bar-wrap{margin:6px 4px 0;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;}
 .wg-bar-fill{height:100%;border-radius:2px;transition:width .3s ease;}
+/* Amazon week windows grid */
+.aw-win-grid{grid-template-columns:repeat(4,1fr)!important;}
+.wg-cell.aw-current{border-color:rgba(255,179,71,0.5);border-top-color:rgba(255,179,71,0.8);background:rgba(255,179,71,0.06);box-shadow:0 4px 20px rgba(255,179,71,0.12),inset 0 1px 0 rgba(255,179,71,0.25);}
+.wg-cell.aw-current::before{background:linear-gradient(90deg,transparent,rgba(255,179,71,0.4),transparent);}
+.wg-cell.aw-wk-paid{border-color:rgba(0,230,118,0.35);border-top-color:rgba(0,230,118,0.6);background:rgba(0,230,118,0.05);}
+.wg-paid-tag{display:inline-block;margin-top:5px;font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#00E676;background:rgba(0,230,118,0.12);padding:2px 7px;border-radius:4px;}
+.wg-upcoming-tag{display:inline-block;margin-top:5px;font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);background:rgba(255,255,255,0.05);padding:2px 7px;border-radius:4px;}
+
 .wg-worst-tag{
   display:inline-block;margin-top:5px;
   font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
@@ -1038,6 +1046,16 @@ body{
   width:4px;height:4px;border-radius:50%;
   background:currentColor;opacity:.8;
 }
+
+/* Amazon week strip */
+.aw-start{border-top:2px solid var(--accent)!important;border-top-left-radius:12px;border-top-right-radius:4px;}
+.aw-end{border-bottom:2px solid var(--accent)!important;border-bottom-right-radius:12px;border-bottom-left-radius:4px;}
+.aw-paid{background:rgba(0,230,118,0.07)!important;}
+.aw-paid.aw-start{border-top-color:#00E676!important;}
+.aw-paid.aw-end{border-bottom-color:#00E676!important;}
+.aw-current-week{outline:1px solid rgba(255,179,71,0.35);outline-offset:-1px;}
+.aw-week-lbl{position:absolute;top:2px;left:3px;font-size:5px;font-weight:900;letter-spacing:.07em;color:var(--accent);font-family:var(--mono);opacity:.75;line-height:1;}
+.aw-paid-badge{position:absolute;bottom:2px;right:2px;font-size:5px;font-weight:900;letter-spacing:.05em;color:#00E676;font-family:var(--mono);line-height:1;}
 
 /* Legend */
 .cal-legend{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
@@ -1631,6 +1649,42 @@ function renderSummary(){
         <div class="mc-sub">${r.futureDates.length?r.futureDates.map(fmtS).join(', '):'None'}</div>
       </div>
     </div>
+    <div class="win-title">Amazon work weeks · Wed → Tue</div>
+    <div class="win-grid aw-win-grid">${(()=>{
+      const todayDate=pd(today);
+      const dow=(todayDate.getDay()+6)%7;
+      const daysSinceWed=dow>=2?dow-2:dow+5;
+      const ds=d=>{ const x=new Date(todayDate.getTime()+d*86400000);
+        return`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`; };
+      return[-2,-1,0,1].map(wk=>{
+        const wedOff=wk*7-daysSinceWed;
+        const wedStr=ds(wedOff);
+        const tueStr=ds(wedOff+6);
+        let used=0;
+        for(let i=0;i<7;i++){const s=shifts[ds(wedOff+i)];if(s&&COUNTED(s.status))used+=s.hours||0;}
+        used=+used.toFixed(1);
+        const free=Math.max(0,+(24-used).toFixed(1));
+        const pct=Math.min(100,(used/24)*100);
+        const isPaid=tueStr<today;
+        const isCurrent=wedStr<=today&&today<=tueStr;
+        const col=used>=24?'#FF5F6D':used>=20?'#FFB347':'#00D4FF';
+        const freeCol=free===0?'#FF5F6D':free<4?'#FFB347':'#00E676';
+        const lbl=isPaid?'Paid':'Week '+(wk===-2?'-2':wk===-1?'-1':wk===0?'(now)':'+1');
+        const tag=isPaid
+          ?`<div class="wg-paid-tag">✓ paid</div>`
+          :isCurrent
+            ?`<div class="wg-safe-tag" style="color:${freeCol};background:${freeCol}1A">${free}h free</div>`
+            :`<div class="wg-upcoming-tag">upcoming</div>`;
+        return`<div class="wg-cell${isCurrent?' aw-current':isPaid?' aw-wk-paid':''}">
+          <div class="wg-off">${lbl}</div>
+          <div class="wg-range">${fmtS(wedStr)}<br/>${fmtS(tueStr)}</div>
+          <div class="wg-hrs" style="color:${col};text-shadow:0 0 16px ${col}55">${used}h</div>
+          <div class="wg-cap">/ 24h used</div>
+          <div class="wg-bar-wrap"><div class="wg-bar-fill" style="width:${pct}%;background:${col};box-shadow:0 0 5px ${col}66"></div></div>
+          ${tag}
+        </div>`;
+      }).join('');
+    })()}</div>
     <div class="win-title">7 overlapping windows · worst sets your limit</div>
     <div class="win-grid">${(()=>{
       // Find the single worst cell: only flag if total>0; on a tie, pick the last (T, index 6) as it's most relevant
@@ -1776,6 +1830,19 @@ function renderCalendar(){
     const hasShift=e&&(e.hours||0)>0;
     const pc=pilClass(dateStr);
 
+    // Amazon week (Wed→Tue) calculations
+    const dow=(new Date(calYear,calMonth,d).getDay()+6)%7; // 0=Mon…6=Sun
+    const isAwStart=dow===2; // Wednesday
+    const isAwEnd=dow===1;   // Tuesday
+    const daysToTue=dow<=1?1-dow:8-dow;
+    const awEndDate=new Date(calYear,calMonth,d+daysToTue);
+    const awEndStr=`${awEndDate.getFullYear()}-${String(awEndDate.getMonth()+1).padStart(2,'0')}-${String(awEndDate.getDate()).padStart(2,'0')}`;
+    const daysSinceWed=dow>=2?dow-2:dow+5;
+    const awStartDate=new Date(calYear,calMonth,d-daysSinceWed);
+    const awStartStr=`${awStartDate.getFullYear()}-${String(awStartDate.getMonth()+1).padStart(2,'0')}-${String(awStartDate.getDate()).padStart(2,'0')}`;
+    const awPaid=awEndStr<today;
+    const awCurrent=awStartStr<=today&&today<=awEndStr;
+
     const cell=document.createElement('div');
     let cls='cal-day';
     if(isToday) cls+=' cd-today';
@@ -1790,8 +1857,14 @@ function renderCalendar(){
       else cls+=' cd-avail';
     }
     if(hasShift) cls+=' has-shift';
+    if(isAwStart) cls+=' aw-start';
+    if(isAwEnd) cls+=' aw-end';
+    if(awPaid) cls+=' aw-paid';
+    if(awCurrent) cls+=' aw-current-week';
     cell.className=cls;
-    cell.textContent=d;
+    cell.innerHTML=d
+      +(isAwStart?'<span class="aw-week-lbl">AW</span>':'')
+      +(isAwEnd&&awPaid?'<span class="aw-paid-badge">PAID ✓</span>':'');
     cell.title=`${dateStr} · ${pc}`;
 
     cell.addEventListener('click',()=>{
