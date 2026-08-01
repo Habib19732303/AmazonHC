@@ -1225,13 +1225,13 @@ body{
 /* Status bar */
 .delivery-status{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:10px;font-family:var(--mono);color:var(--text2);}
 .ds-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#00E676;box-shadow:0 0 8px #00E676;animation:dsPulse 1.2s ease-in-out infinite alternate;}
-@keyframes dsPulse{from{opacity:.4;box-shadow:0 0 4px #00E676;}to{opacity:1;box-shadow:0 0 12px #00E676;}}
+@keyframes dsPulse{from{opacity:.4;}to{opacity:1;}}
 
 /* ═══════════════════════════ CAL DELIVERY SCENE ═══════════════════════════ */
-.cal-delivery{margin:12px 0 0;border-radius:16px;overflow:hidden;border:1px solid rgba(255,179,71,0.2);position:relative;}
+.cal-delivery{margin:12px 0 0;border-radius:16px;overflow:hidden;border:1px solid rgba(255,179,71,0.2);position:relative;transform:translateZ(0);will-change:transform;}
 .cd-label{display:flex;align-items:center;gap:6px;font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);padding:6px 12px 4px;background:rgba(0,0,0,0.3);}
 .cd-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#FF9900;box-shadow:0 0 8px #FF9900;animation:cdDot 1.2s ease-in-out infinite alternate;}
-@keyframes cdDot{from{opacity:.4;}to{opacity:1;box-shadow:0 0 14px #FF9900;}}
+@keyframes cdDot{from{opacity:.4;}to{opacity:1;}}
 .cd-counter{margin-left:auto;display:flex;align-items:center;gap:6px;}
 .cd-count-txt{font-size:11px;font-weight:900;color:#FF9900;letter-spacing:.05em;transition:color .3s,transform .3s;display:inline-block;}
 .cd-count-txt span{color:#fff;opacity:.5;}
@@ -1250,7 +1250,7 @@ body{
   background:radial-gradient(circle,#FFD700,#FF9900);
   box-shadow:0 0 20px #FFD70088,0 0 40px #FF990044;
   animation:sunPulse 3s ease-in-out infinite alternate;}
-@keyframes sunPulse{from{box-shadow:0 0 14px #FFD70066;}to{box-shadow:0 0 30px #FFD700aa,0 0 50px #FF990055;}}
+@keyframes sunPulse{from{opacity:.8;}to{opacity:1;}}
 
 /* Clouds */
 .cd-cloud{position:absolute;top:18px;height:14px;border-radius:20px;background:rgba(255,255,255,0.08);}
@@ -1282,7 +1282,7 @@ body{
 .cd-wall{width:60px;height:34px;background:#0f2040;border:1px solid rgba(0,212,255,0.25);border-top:none;position:relative;}
 .cd-door{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:14px;height:20px;background:#070f1e;border:1px solid rgba(0,212,255,0.3);border-bottom:none;border-radius:3px 3px 0 0;}
 .cd-win{position:absolute;top:6px;left:6px;width:10px;height:9px;background:rgba(255,210,0,0.15);border:1px solid rgba(255,210,0,0.3);border-radius:1px;animation:winGlow 2s ease-in-out infinite alternate;}
-@keyframes winGlow{from{background:rgba(255,210,0,0.08);}to{background:rgba(255,210,0,0.3);box-shadow:0 0 6px rgba(255,210,0,0.4);}}
+@keyframes winGlow{from{opacity:.4;}to{opacity:1;}}
 .cd-door-glow{position:absolute;bottom:16px;right:40px;width:14px;height:2px;background:#FFD700;box-shadow:0 0 8px #FFD700;opacity:0;border-radius:2px;animation:doorOpen 5s linear infinite;}
 @keyframes doorOpen{0%,55%{opacity:0;}60%{opacity:1;}75%{opacity:0;}100%{opacity:0;}}
 
