@@ -1239,7 +1239,7 @@ body{
 .cd-prog-wrap{width:100%;height:18px;background:rgba(255,255,255,0.07);border-radius:9px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);}
 .cd-prog-bar{height:100%;width:0%;background:linear-gradient(90deg,#00C853,#00E676,#69F0AE);border-radius:9px;transition:width .5s ease;box-shadow:0 0 10px rgba(0,230,118,0.7),inset 0 1px 0 rgba(255,255,255,0.25);}
 
-.cd-scene{position:relative;height:140px;overflow:hidden;contain:layout style;transform:translateZ(0);}
+.cd-scene{position:relative;height:140px;overflow:hidden;isolation:isolate;}
 
 /* Sky */
 .cd-sky{position:absolute;inset:0;background:linear-gradient(180deg,#0a1628 0%,#0d2044 60%,#1a3a2a 100%);}
@@ -2747,10 +2747,9 @@ document.querySelectorAll('.theme-btn').forEach(b=>{
     if(!txtEl||!barEl)return;
     txtEl.innerHTML=`${count}<span>/${TOTAL}</span>`;
     barEl.style.width=((count/TOTAL)*100)+'%';
-    // Flash the number
-    txtEl.style.transform='scale(1.3)';
+    // Flash the number (colour only — no scale to avoid layout shift)
     txtEl.style.color='#FFD700';
-    setTimeout(()=>{txtEl.style.transform='';txtEl.style.color='';},300);
+    setTimeout(()=>{txtEl.style.color='';},400);
     count=count<TOTAL?count+1:1;
   }
   update();
