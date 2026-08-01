@@ -1226,6 +1226,121 @@ body{
 .ds-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#00E676;box-shadow:0 0 8px #00E676;animation:dsPulse 1.2s ease-in-out infinite alternate;}
 @keyframes dsPulse{from{opacity:.4;box-shadow:0 0 4px #00E676;}to{opacity:1;box-shadow:0 0 12px #00E676;}}
 
+/* ═══════════════════════════ CAL DELIVERY SCENE ═══════════════════════════ */
+.cal-delivery{margin:12px 0 0;border-radius:16px;overflow:hidden;border:1px solid rgba(255,179,71,0.2);position:relative;}
+.cd-label{display:flex;align-items:center;gap:6px;font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);padding:6px 12px 8px;background:rgba(0,0,0,0.3);}
+.cd-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#FF9900;box-shadow:0 0 8px #FF9900;animation:cdDot 1.2s ease-in-out infinite alternate;}
+@keyframes cdDot{from{opacity:.4;}to{opacity:1;box-shadow:0 0 14px #FF9900;}}
+
+.cd-scene{position:relative;height:140px;overflow:hidden;}
+
+/* Sky */
+.cd-sky{position:absolute;inset:0;background:linear-gradient(180deg,#0a1628 0%,#0d2044 60%,#1a3a2a 100%);}
+
+/* Sun */
+.cd-sun{position:absolute;top:12px;right:40px;width:28px;height:28px;border-radius:50%;
+  background:radial-gradient(circle,#FFD700,#FF9900);
+  box-shadow:0 0 20px #FFD70088,0 0 40px #FF990044;
+  animation:sunPulse 3s ease-in-out infinite alternate;}
+@keyframes sunPulse{from{box-shadow:0 0 14px #FFD70066;}to{box-shadow:0 0 30px #FFD700aa,0 0 50px #FF990055;}}
+
+/* Clouds */
+.cd-cloud{position:absolute;top:18px;height:14px;border-radius:20px;background:rgba(255,255,255,0.08);}
+.c1{width:60px;left:-70px;animation:cloudDrift 12s linear infinite;}
+.c2{width:40px;top:28px;left:-50px;animation:cloudDrift 18s linear infinite 4s;background:rgba(255,255,255,0.05);}
+@keyframes cloudDrift{to{left:110%;}}
+
+/* Buildings */
+.cd-buildings{position:absolute;bottom:30px;left:0;right:0;display:flex;align-items:flex-end;gap:3px;padding:0 8px;}
+.cd-bld{border-radius:3px 3px 0 0;background:rgba(10,20,40,0.9);border-top:1px solid rgba(0,212,255,0.15);}
+.b1{width:28px;height:45px;}
+.b2{width:20px;height:62px;border-top-color:rgba(0,212,255,0.25);}
+.b3{width:24px;height:38px;}
+.b4{width:18px;height:52px;}
+
+/* Ground */
+.cd-ground{position:absolute;bottom:0;left:0;right:0;height:30px;background:linear-gradient(180deg,#0d2208,#091a06);}
+
+/* Road */
+.cd-road{position:absolute;bottom:0;left:0;right:0;height:16px;background:rgba(255,255,255,0.04);border-top:1px solid rgba(255,255,255,0.06);}
+.cd-road-dash{position:absolute;top:50%;left:0;width:200%;height:2px;transform:translateY(-50%);
+  background:repeating-linear-gradient(90deg,rgba(255,179,71,0.4) 0 14px,transparent 14px 28px);
+  animation:cdRoad 0.8s linear infinite;}
+@keyframes cdRoad{to{transform:translateY(-50%) translateX(-56px);}}
+
+/* House */
+.cd-house{position:absolute;bottom:16px;right:18px;}
+.cd-roof{width:0;height:0;border-left:30px solid transparent;border-right:30px solid transparent;border-bottom:22px solid #1a3a5c;filter:drop-shadow(0 -1px 0 rgba(0,212,255,0.4));}
+.cd-wall{width:60px;height:34px;background:#0f2040;border:1px solid rgba(0,212,255,0.25);border-top:none;position:relative;}
+.cd-door{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:14px;height:20px;background:#070f1e;border:1px solid rgba(0,212,255,0.3);border-bottom:none;border-radius:3px 3px 0 0;}
+.cd-win{position:absolute;top:6px;left:6px;width:10px;height:9px;background:rgba(255,210,0,0.15);border:1px solid rgba(255,210,0,0.3);border-radius:1px;animation:winGlow 2s ease-in-out infinite alternate;}
+@keyframes winGlow{from{background:rgba(255,210,0,0.08);}to{background:rgba(255,210,0,0.3);box-shadow:0 0 6px rgba(255,210,0,0.4);}}
+.cd-door-glow{position:absolute;bottom:16px;right:40px;width:14px;height:2px;background:#FFD700;box-shadow:0 0 8px #FFD700;opacity:0;border-radius:2px;animation:doorOpen 5s linear infinite;}
+@keyframes doorOpen{0%,55%{opacity:0;}60%{opacity:1;}75%{opacity:0;}100%{opacity:0;}}
+
+/* Person */
+.cd-person{position:absolute;bottom:16px;animation:personWalk 5s linear infinite;}
+@keyframes personWalk{
+  0%{left:-40px;}
+  55%{left:calc(100% - 110px);}
+  58%{left:calc(100% - 110px);}
+  100%{left:calc(100% - 110px);}
+}
+.cd-head{position:absolute;top:0;left:10px;width:14px;height:14px;border-radius:50%;background:#F5C5A3;border:1px solid rgba(255,255,255,0.2);}
+.cd-torso{position:absolute;top:13px;left:6px;width:22px;height:22px;border-radius:4px;background:#FF9900;}
+.cd-leg{position:absolute;top:33px;width:8px;height:16px;border-radius:0 0 4px 4px;background:#1a3a5c;}
+.l1{left:7px;animation:legSwing 0.5s ease-in-out infinite alternate;transform-origin:top center;}
+.l2{left:17px;animation:legSwing 0.5s ease-in-out infinite alternate reverse;transform-origin:top center;}
+@keyframes legSwing{from{transform:rotate(-12deg);}to{transform:rotate(12deg);}}
+.cd-arm{position:absolute;top:15px;width:7px;height:16px;border-radius:4px;background:#F5C5A3;}
+.a1{left:1px;transform:rotate(-20deg);transform-origin:top center;}
+.a2{left:26px;transform:rotate(20deg);transform-origin:top center;}
+.cd-person-parcel{position:absolute;top:10px;left:5px;width:24px;height:20px;background:#1a2a4a;border:2px solid #FF9900;border-radius:3px;
+  animation:parcelCarry 5s linear infinite;}
+@keyframes parcelCarry{0%,54%{opacity:1;}58%{opacity:0;}100%{opacity:0;}}
+
+/* Placed parcel on doorstep */
+.cd-placed-parcel{position:absolute;bottom:16px;right:46px;width:18px;height:14px;
+  background:#1a2a4a;border:2px solid #FF9900;border-radius:2px;opacity:0;
+  animation:placeParcel 5s linear infinite;}
+@keyframes placeParcel{0%,57%{opacity:0;}60%{opacity:1;}100%{opacity:1;}}
+
+/* Floating parcels trail */
+.cd-float-parcel{position:absolute;font-size:13px;opacity:0;bottom:20px;}
+.fp1{animation:fpFloat 5s linear infinite;animation-delay:0s;}
+.fp2{animation:fpFloat 5s linear infinite;animation-delay:.3s;}
+@keyframes fpFloat{
+  0%{opacity:0;left:10px;transform:translateY(0);}
+  5%{opacity:.8;}
+  50%{opacity:.5;left:55%;transform:translateY(-8px);}
+  55%{opacity:0;}
+  100%{opacity:0;}
+}
+
+/* Tick */
+.cd-tick{position:absolute;top:14px;right:22px;font-size:26px;font-weight:900;
+  color:#00E676;text-shadow:0 0 14px #00E676;opacity:0;
+  animation:cdTick 5s linear infinite;}
+@keyframes cdTick{
+  0%,60%{opacity:0;transform:scale(.4);}
+  65%{opacity:1;transform:scale(1.3);}
+  70%{opacity:1;transform:scale(1);}
+  82%{opacity:0;}
+  100%{opacity:0;}
+}
+
+/* Sparkles */
+.cd-spark{position:absolute;font-size:10px;opacity:0;color:#FFD700;}
+.s1{top:20px;right:30px;animation:sparkle 5s linear infinite .62s;}
+.s2{top:30px;right:14px;animation:sparkle 5s linear infinite .8s;}
+.s3{top:14px;right:48px;font-size:8px;color:#00E676;animation:sparkle 5s linear infinite .7s;}
+@keyframes sparkle{
+  0%,60%{opacity:0;transform:scale(0);}
+  68%{opacity:1;transform:scale(1.4);}
+  80%{opacity:0;transform:scale(.8);}
+  100%{opacity:0;}
+}
+
 /* ═══════════════════════════ WEATHER ═══════════════════════════ */
 .wx-current{text-align:center;padding:8px 0 12px;}
 .wx-icon{font-size:48px;line-height:1;margin-bottom:4px;}
@@ -1309,6 +1424,63 @@ body{
       <button class="cal-arrow" id="calNext" aria-label="Next month">&#8250;</button>
     </div>
     <div class="cal-grid" id="calGrid"></div>
+  </div>
+
+  <!-- Calendar bottom delivery scene -->
+  <div class="cal-delivery">
+    <div class="cd-scene">
+      <!-- Sky gradient background -->
+      <div class="cd-sky"></div>
+      <!-- Sun -->
+      <div class="cd-sun"></div>
+      <!-- Clouds -->
+      <div class="cd-cloud c1"></div>
+      <div class="cd-cloud c2"></div>
+      <!-- Buildings background -->
+      <div class="cd-buildings">
+        <div class="cd-bld b1"></div>
+        <div class="cd-bld b2"></div>
+        <div class="cd-bld b3"></div>
+        <div class="cd-bld b4"></div>
+      </div>
+      <!-- Ground -->
+      <div class="cd-ground"></div>
+      <!-- Road markings -->
+      <div class="cd-road"><div class="cd-road-dash"></div></div>
+      <!-- House -->
+      <div class="cd-house">
+        <div class="cd-roof"></div>
+        <div class="cd-wall">
+          <div class="cd-door"></div>
+          <div class="cd-win"></div>
+        </div>
+        <div class="cd-door-glow"></div>
+      </div>
+      <!-- Person (delivery rider) -->
+      <div class="cd-person">
+        <!-- Body -->
+        <div class="cd-head"></div>
+        <div class="cd-torso"></div>
+        <div class="cd-leg l1"></div>
+        <div class="cd-leg l2"></div>
+        <div class="cd-arm a1"></div>
+        <div class="cd-arm a2"></div>
+        <!-- Parcel in arms -->
+        <div class="cd-person-parcel"></div>
+      </div>
+      <!-- Parcel on doorstep -->
+      <div class="cd-placed-parcel"></div>
+      <!-- Floating parcels -->
+      <div class="cd-float-parcel fp1">📦</div>
+      <div class="cd-float-parcel fp2">📦</div>
+      <!-- Tick -->
+      <div class="cd-tick">✓</div>
+      <!-- Stars/sparkles -->
+      <div class="cd-spark s1">✦</div>
+      <div class="cd-spark s2">✦</div>
+      <div class="cd-spark s3">★</div>
+    </div>
+    <div class="cd-label"><span class="cd-dot"></span>Amazon Flex Driver</div>
   </div>
 </aside>
 
