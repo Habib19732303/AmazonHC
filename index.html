@@ -743,6 +743,46 @@ body{
   margin-bottom:14px;font-family:var(--mono);
 }
 .tpl-link a{color:var(--cyan);cursor:pointer;text-decoration:underline;}
+/* Saved CSV banner */
+.csv-saved-banner{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.25);
+  border-radius:12px;padding:10px 14px;margin-bottom:14px;
+}
+.csv-saved-name{font-size:12px;font-family:var(--mono);color:#00E676;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.csv-saved-actions{display:flex;gap:6px;flex-shrink:0;}
+.csv-reload-btn{padding:5px 11px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(0,230,118,0.4);background:rgba(0,230,118,0.12);color:#00E676;font-family:var(--mono);}
+.csv-reload-btn:hover{background:rgba(0,230,118,0.22);}
+.csv-forget-btn{padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:var(--text3);font-family:var(--mono);}
+.csv-forget-btn:hover{background:rgba(255,95,109,0.12);color:#FF5F6D;border-color:rgba(255,95,109,0.3);}
+/* Import tabs */
+.import-tabs{display:flex;gap:6px;margin-bottom:14px;}
+.import-tab{flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--mono);border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--text3);transition:all .15s;}
+.import-tab.active{background:rgba(0,212,255,0.12);border-color:rgba(0,212,255,0.35);color:var(--cyan);}
+.import-tab:hover:not(.active){background:rgba(255,255,255,0.08);color:var(--text2);}
+/* Paste tab */
+.csv-paste-area{
+  width:100%;min-height:120px;resize:vertical;
+  background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px;padding:12px;
+  font-family:var(--mono);font-size:12px;color:var(--text);line-height:1.6;
+  outline:none;box-sizing:border-box;margin-bottom:10px;
+  transition:border-color .2s;
+}
+.csv-paste-area:focus{border-color:rgba(0,212,255,0.4);}
+.csv-paste-area::placeholder{color:var(--text3);}
+.csv-paste-btn{
+  width:100%;padding:10px;border-radius:12px;font-size:13px;font-weight:700;
+  cursor:pointer;border:1px solid rgba(0,212,255,0.35);
+  background:rgba(0,212,255,0.1);color:var(--cyan);font-family:var(--mono);
+  transition:background .15s;
+}
+.csv-paste-btn:hover{background:rgba(0,212,255,0.2);}
+/* Saved dot on header Import button */
+.import-btn .saved-dot{
+  display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:#00E676;box-shadow:0 0 6px #00E676;margin-left:5px;vertical-align:middle;
+}
 
 /* ═══════════════════════════ RESET BUTTON ═══════════════════════════ */
 .reset-btn{
@@ -1207,7 +1247,7 @@ body{
       <div class="date-pill" id="datePill"></div>
       <button id="importBtn" class="import-btn" aria-label="Import CSV">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Import CSV
+        Import CSV<span class="saved-dot" style="display:none"></span>
       </button>
       <button id="resetBtn" class="reset-btn" aria-label="Reset all shifts">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
@@ -1239,21 +1279,51 @@ body{
   <div id="importOverlay" class="import-overlay" role="dialog" aria-modal="true" aria-labelledby="importTitle">
     <div class="import-box">
       <div class="import-title" id="importTitle">📂 Import Shifts from CSV</div>
-      <div class="import-sub">Keep a simple CSV of your shifts. Just two columns — Date and Hours. Import anytime and the app fills in your current window automatically.</div>
-      <div class="import-format">
-        <b>Date,Hours</b><br>
-        24/06/2026,4<br>
-        25/06/2026,3.5<br>
-        27/06/2026,4<br>
-        <span style="opacity:.5">— DD/MM/YYYY or YYYY-MM-DD accepted —</span>
+      <div class="import-sub">Keep a simple CSV of your shifts. Two columns — Date and Hours. Chrome/Edge users can save their file for one-click reloading next time.</div>
+
+      <!-- Saved file banner (shown when a handle is stored) -->
+      <div class="csv-saved-banner" id="csvSavedBanner" style="display:none">
+        <div>
+          <div style="font-size:10px;color:rgba(0,230,118,0.7);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">📎 Saved CSV</div>
+          <div class="csv-saved-name" id="csvSavedName">—</div>
+        </div>
+        <div class="csv-saved-actions">
+          <button class="csv-reload-btn" id="reloadSavedBtn">🔄 Reload</button>
+          <button class="csv-forget-btn" id="forgetSavedBtn">✕ Forget</button>
+        </div>
       </div>
-      <div class="tpl-link">Need a template? <a id="downloadTpl">Download sample CSV</a></div>
-      <div class="drop-zone" id="dropZone">
-        <div class="drop-zone-icon">📄</div>
-        <div class="drop-zone-txt">Drop your CSV here or click to browse</div>
-        <div class="drop-zone-sub">Supports .csv files</div>
-        <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none"/>
+
+      <!-- Tabs -->
+      <div class="import-tabs">
+        <button class="import-tab active" data-tab="file">📄 File / Drop</button>
+        <button class="import-tab" data-tab="paste">📋 Paste CSV</button>
       </div>
+
+      <!-- File tab -->
+      <div id="tabFile">
+        <div class="import-format">
+          <b>Date,Hours</b><br>
+          24/06/2026,4<br>
+          25/06/2026,3.5<br>
+          27/06/2026,4<br>
+          <span style="opacity:.5">— DD/MM/YYYY or YYYY-MM-DD accepted —</span>
+        </div>
+        <div class="tpl-link">Need a template? <a id="downloadTpl">Download sample CSV</a></div>
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-zone-icon">📄</div>
+          <div class="drop-zone-txt">Drop your CSV here or click to browse</div>
+          <div class="drop-zone-sub">Supports .csv files · Chrome/Edge: file will be remembered</div>
+          <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none"/>
+        </div>
+      </div>
+
+      <!-- Paste tab -->
+      <div id="tabPaste" style="display:none">
+        <div class="import-sub" style="margin-bottom:10px;margin-top:0">Paste your CSV text below — works on all browsers and devices including mobile.</div>
+        <textarea class="csv-paste-area" id="csvPasteArea" placeholder="Date,Hours&#10;29/07/2026,4&#10;30/07/2026,3.5&#10;01/08/2026,4"></textarea>
+        <button class="csv-paste-btn" id="importPasteBtn">⬆ Import Pasted CSV</button>
+      </div>
+
       <div class="import-result" id="importResult"></div>
       <div class="import-actions">
         <button class="import-cancel" id="importCancel">Close</button>
@@ -2097,22 +2167,13 @@ function parseCSV(text){
 }
 
 function applyImport(result){
-  const el=document.getElementById('importResult');
-  if(result.error){
-    el.className='import-result err';
-    el.style.display='block';
-    el.textContent='⚠ '+result.error;
-    return;
-  }
+  if(result.error){showImportResult('err','⚠ '+result.error);return;}
 
   // newShifts already applied to shifts during parse — just save & rebuild
   save();
   buildGrid();
 
   const hasIssues=result.skipped||result.outOfWindow||result.blocked.length;
-  el.className='import-result '+(result.imported>0?'ok':'err');
-  el.style.display='block';
-
   let html='';
   if(result.imported>0)
     html+=`✓ <b>${result.imported}</b> shift${result.imported!==1?'s':''} imported successfully<br>`;
@@ -2126,15 +2187,91 @@ function applyImport(result){
     html+=`<br>⚠ ${result.skipped} row${result.skipped!==1?'s':''} skipped (unreadable date or invalid hours)`;
   if(result.outOfWindow)
     html+=`<br>📅 ${result.outOfWindow} row${result.outOfWindow!==1?'s':''} outside the 13-day window (ignored)`;
-
   if(!result.imported&&!hasIssues) html='No matching rows found for the current window.';
+  showImportResult(result.imported>0?'ok':'err',html);
+}
+
+/* ═══════ IndexedDB helpers for saved CSV file handle ═══════ */
+const IDB_NAME='flexCSV',IDB_STORE='handles',IDB_KEY='csv';
+function idbOpen(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open(IDB_NAME,1);
+    r.onupgradeneeded=e=>e.target.result.createObjectStore(IDB_STORE);
+    r.onsuccess=e=>res(e.target.result);
+    r.onerror=rej;
+  });
+}
+async function idbSave(val){try{const db=await idbOpen();db.transaction(IDB_STORE,'readwrite').objectStore(IDB_STORE).put(val,IDB_KEY);}catch(e){}}
+async function idbLoad(){try{const db=await idbOpen();return new Promise(res=>{const r=db.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).get(IDB_KEY);r.onsuccess=e=>res(e.target.result||null);r.onerror=()=>res(null);});}catch(e){return null;}}
+async function idbClear(){try{const db=await idbOpen();db.transaction(IDB_STORE,'readwrite').objectStore(IDB_STORE).delete(IDB_KEY);}catch(e){}}
+
+/* ═══════ Saved-handle UI ═══════ */
+const FSA_SUPPORTED=typeof window.showOpenFilePicker==='function';
+
+async function refreshSavedBanner(){
+  const banner=document.getElementById('csvSavedBanner');
+  const dot=document.querySelector('.import-btn .saved-dot');
+  if(!FSA_SUPPORTED){banner.style.display='none';return;}
+  const handle=await idbLoad();
+  if(handle){
+    document.getElementById('csvSavedName').textContent=handle.name;
+    banner.style.display='flex';
+    if(dot)dot.style.display='inline-block';
+  } else {
+    banner.style.display='none';
+    if(dot)dot.style.display='none';
+  }
+}
+
+document.getElementById('reloadSavedBtn').addEventListener('click',async()=>{
+  const handle=await idbLoad();
+  if(!handle)return;
+  try{
+    let perm=await handle.queryPermission({mode:'read'});
+    if(perm!=='granted')perm=await handle.requestPermission({mode:'read'});
+    if(perm!=='granted'){showImportResult('err','⚠ Permission denied — please pick the file manually.');return;}
+    const file=await handle.getFile();
+    const text=await file.text();
+    applyImport(parseCSV(text));
+  }catch(e){showImportResult('err','⚠ Could not reload file: '+e.message);}
+});
+
+document.getElementById('forgetSavedBtn').addEventListener('click',async()=>{
+  await idbClear();
+  refreshSavedBanner();
+});
+
+function showImportResult(cls,html){
+  const el=document.getElementById('importResult');
+  el.className='import-result '+cls;
+  el.style.display='block';
   el.innerHTML=html;
 }
 
-// Modal open/close
+/* ═══════ Tab switching ═══════ */
+document.querySelectorAll('.import-tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.import-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab=btn.dataset.tab;
+    document.getElementById('tabFile').style.display=tab==='file'?'':'none';
+    document.getElementById('tabPaste').style.display=tab==='paste'?'':'none';
+    document.getElementById('importResult').style.display='none';
+  });
+});
+
+/* ═══════ Paste import ═══════ */
+document.getElementById('importPasteBtn').addEventListener('click',()=>{
+  const text=document.getElementById('csvPasteArea').value.trim();
+  if(!text){showImportResult('err','⚠ Nothing pasted yet.');return;}
+  applyImport(parseCSV(text));
+});
+
+/* ═══════ Modal open/close ═══════ */
 document.getElementById('importBtn').addEventListener('click',()=>{
   document.getElementById('importResult').style.display='none';
   document.getElementById('importOverlay').classList.add('open');
+  refreshSavedBanner();
 });
 document.getElementById('importCancel').addEventListener('click',()=>{
   document.getElementById('importOverlay').classList.remove('open');
@@ -2143,20 +2280,34 @@ document.getElementById('importOverlay').addEventListener('click',function(e){
   if(e.target===this)this.classList.remove('open');
 });
 
-// File input via click on drop zone
+/* ═══════ File drop zone ═══════ */
 const dropZone=document.getElementById('dropZone');
 const csvInput=document.getElementById('csvFileInput');
-dropZone.addEventListener('click',()=>csvInput.click());
+
+dropZone.addEventListener('click',async()=>{
+  if(FSA_SUPPORTED){
+    try{
+      const [handle]=await window.showOpenFilePicker({types:[{description:'CSV',accept:{'text/csv':['.csv']}}],multiple:false});
+      await idbSave(handle);
+      refreshSavedBanner();
+      const file=await handle.getFile();
+      const text=await file.text();
+      applyImport(parseCSV(text));
+    }catch(e){if(e.name!=='AbortError')showImportResult('err','⚠ '+e.message);}
+  } else {
+    csvInput.click();
+  }
+});
+
 csvInput.addEventListener('change',e=>{
   const file=e.target.files[0];
   if(file)readFile(file);
   csvInput.value='';
 });
 
-// Drag and drop
 dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
 dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop',e=>{
+dropZone.addEventListener('drop',async e=>{
   e.preventDefault();
   dropZone.classList.remove('drag-over');
   const file=e.dataTransfer.files[0];
@@ -2164,17 +2315,14 @@ dropZone.addEventListener('drop',e=>{
 });
 
 function readFile(file){
-  if(!file.name.match(/\.csv$/i)){
-    const el=document.getElementById('importResult');
-    el.className='import-result err';
-    el.style.display='block';
-    el.textContent='⚠ Please upload a .csv file.';
-    return;
-  }
+  if(!file.name.match(/\.csv$/i)){showImportResult('err','⚠ Please upload a .csv file.');return;}
   const reader=new FileReader();
   reader.onload=e=>applyImport(parseCSV(e.target.result));
   reader.readAsText(file);
 }
+
+// Check for saved handle on page load (show dot on Import button)
+refreshSavedBanner();
 
 // Download sample CSV template
 document.getElementById('downloadTpl').addEventListener('click',()=>{
