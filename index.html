@@ -1279,29 +1279,34 @@ body{
 @keyframes doorOpen{0%,55%{opacity:0;}60%{opacity:1;}75%{opacity:0;}100%{opacity:0;}}
 
 /* Person */
-.cd-person{position:absolute;bottom:16px;width:52px;height:72px;animation:personWalk 5s linear infinite;}
+.cd-person{position:absolute;bottom:16px;width:44px;height:62px;animation:personWalk 5s linear infinite;}
 @keyframes personWalk{
-  0%{left:-60px;}
-  55%{left:calc(100% - 120px);}
-  57%{left:calc(100% - 120px);}
-  100%{left:calc(100% - 120px);}
+  0%{left:-80px;}
+  55%{left:calc(100% - 118px);}
+  100%{left:calc(100% - 118px);}
 }
-.cd-person-svg{width:52px;height:72px;}
-/* Walking leg swing via CSS on SVG rects */
-.cd-person-svg .leg-back{animation:legB .45s ease-in-out infinite alternate;transform-origin:20px 38px;}
-.cd-person-svg .leg-front{animation:legF .45s ease-in-out infinite alternate;transform-origin:28px 38px;}
+/* Parcel sits in outstretched arms — centred on person, at arm height */
+.cd-held-parcel{
+  position:absolute;
+  top:14px;left:-6px;
+  width:56px;height:30px;
+  animation:parcelCarry 5s linear infinite;
+  z-index:2;
+}
+.cd-held-parcel svg{width:100%;height:100%;}
+@keyframes parcelCarry{0%,53%{opacity:1;transform:translateY(0);}57%{opacity:0;transform:translateY(4px);}100%{opacity:0;}}
+/* Person SVG */
+.cd-person-svg{position:absolute;bottom:0;left:0;width:44px;height:62px;animation:bodyBob .45s ease-in-out infinite alternate;}
+@keyframes bodyBob{from{transform:translateY(0);}to{transform:translateY(-2px);}}
+/* Walking legs */
+.cd-person-svg .leg-back{animation:legB .45s ease-in-out infinite alternate;transform-origin:16px 36px;}
+.cd-person-svg .leg-front{animation:legF .45s ease-in-out infinite alternate;transform-origin:26px 36px;}
 .cd-person-svg .shoe-back{animation:shoeB .45s ease-in-out infinite alternate;}
 .cd-person-svg .shoe-front{animation:shoeF .45s ease-in-out infinite alternate;}
-@keyframes legB{from{transform:rotate(-18deg);}to{transform:rotate(14deg);}}
-@keyframes legF{from{transform:rotate(14deg);}to{transform:rotate(-18deg);}}
-@keyframes shoeB{from{transform:translateX(-4px);}to{transform:translateX(3px);}}
-@keyframes shoeF{from{transform:translateX(3px);}to{transform:translateX(-4px);}}
-/* Bob body slightly as walking */
-.cd-person-svg{animation:bodyBob .45s ease-in-out infinite alternate;}
-@keyframes bodyBob{from{transform:translateY(0);}to{transform:translateY(-2px);}}
-/* Parcel disappears when placed */
-.cd-person-svg .cd-held-parcel{animation:parcelCarry 5s linear infinite;}
-@keyframes parcelCarry{0%,54%{opacity:1;}58%{opacity:0;}100%{opacity:0;}}
+@keyframes legB{from{transform:rotate(-20deg);}to{transform:rotate(16deg);}}
+@keyframes legF{from{transform:rotate(16deg);}to{transform:rotate(-20deg);}}
+@keyframes shoeB{from{transform:translateX(-5px);}to{transform:translateX(4px);}}
+@keyframes shoeF{from{transform:translateX(4px);}to{transform:translateX(-5px);}}
 
 /* Placed parcel on doorstep */
 .cd-placed-parcel{position:absolute;bottom:16px;right:46px;width:18px;height:14px;
@@ -1463,38 +1468,34 @@ body{
       <!-- Person (delivery rider) -->
       <!-- SVG Person walking toward house holding parcel -->
       <div class="cd-person">
-        <svg class="cd-person-svg" viewBox="0 0 52 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Parcel held in arms — separate element so it releases cleanly -->
+        <div class="cd-held-parcel">
+          <svg viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="1" width="32" height="24" rx="3" fill="#1a2a4a" stroke="#FF9900" stroke-width="2"/>
+            <rect x="1" y="1" width="32" height="8" rx="3" fill="#0f1e38" stroke="#FF9900" stroke-width="1.5"/>
+            <line x1="17" y1="1" x2="17" y2="25" stroke="#FF9900" stroke-width="1.2"/>
+            <line x1="1" y1="13" x2="33" y2="13" stroke="#FF9900" stroke-width="1.2"/>
+            <path d="M9 19 Q17 15 25 19" stroke="#FF9900" stroke-width="1.4" stroke-linecap="round" fill="none" opacity=".8"/>
+          </svg>
+        </div>
+        <!-- Person body -->
+        <svg class="cd-person-svg" viewBox="0 0 44 62" fill="none" xmlns="http://www.w3.org/2000/svg">
           <!-- Head -->
-          <circle cx="26" cy="9" r="8" fill="#F5C5A3" stroke="#e8a882" stroke-width="1"/>
+          <circle cx="22" cy="9" r="8" fill="#F5C5A3" stroke="#e8a882" stroke-width="1"/>
           <!-- Hair -->
-          <path d="M18 7 Q26 1 34 7" fill="#4a2c0a" stroke="none"/>
+          <path d="M14 7 Q22 1 30 7" fill="#4a2c0a"/>
           <!-- Torso (Amazon orange vest) -->
-          <rect x="16" y="17" width="20" height="22" rx="3" fill="#FF9900"/>
-          <!-- Amazon smile on vest -->
-          <path d="M20 27 Q26 32 32 27" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-          <!-- Left leg (back, less visible) -->
-          <rect class="leg-back" x="16" y="38" width="8" height="18" rx="4" fill="#1a3a6c" transform-origin="20 38"/>
-          <!-- Right leg (front) -->
-          <rect class="leg-front" x="24" y="38" width="8" height="18" rx="4" fill="#2050a0" transform-origin="28 38"/>
+          <rect x="12" y="17" width="20" height="20" rx="3" fill="#FF9900"/>
+          <path d="M16 25 Q22 30 28 25" stroke="#1a1a1a" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+          <!-- Arms out forward (carrying position) -->
+          <rect x="0" y="20" width="12" height="7" rx="3.5" fill="#F5C5A3"/>
+          <rect x="32" y="20" width="12" height="7" rx="3.5" fill="#F5C5A3"/>
+          <!-- Legs -->
+          <rect class="leg-back" x="12" y="36" width="8" height="18" rx="4" fill="#1a3a6c" transform-origin="16 36"/>
+          <rect class="leg-front" x="22" y="36" width="8" height="18" rx="4" fill="#2050a0" transform-origin="26 36"/>
           <!-- Shoes -->
-          <ellipse class="shoe-back" cx="20" cy="56" rx="6" ry="3" fill="#111"/>
-          <ellipse class="shoe-front" cx="28" cy="56" rx="6" ry="3" fill="#222"/>
-          <!-- Left arm reaching under parcel -->
-          <rect x="7" y="28" width="9" height="18" rx="4" fill="#F5C5A3" transform="rotate(25 11 28)"/>
-          <!-- Right arm reaching under parcel -->
-          <rect x="36" y="22" width="9" height="16" rx="4" fill="#F5C5A3" transform="rotate(-15 40 22)"/>
-          <!-- PARCEL BOX held out front (carried toward house) -->
-          <g class="cd-held-parcel">
-            <!-- Box body -->
-            <rect x="10" y="14" width="30" height="22" rx="3" fill="#1a2a4a" stroke="#FF9900" stroke-width="1.8"/>
-            <!-- Box top flap -->
-            <rect x="10" y="14" width="30" height="7" rx="3" fill="#0f1e38" stroke="#FF9900" stroke-width="1.5"/>
-            <!-- Tape cross -->
-            <line x1="25" y1="14" x2="25" y2="36" stroke="#FF9900" stroke-width="1.2"/>
-            <line x1="10" y1="25" x2="40" y2="25" stroke="#FF9900" stroke-width="1.2"/>
-            <!-- Amazon arrow on parcel -->
-            <path d="M16 30 Q25 26 34 30" stroke="#FF9900" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".7"/>
-          </g>
+          <ellipse class="shoe-back" cx="16" cy="54" rx="7" ry="3.5" fill="#111"/>
+          <ellipse class="shoe-front" cx="26" cy="54" rx="7" ry="3.5" fill="#222"/>
         </svg>
       </div>
       <!-- Parcel on doorstep -->
