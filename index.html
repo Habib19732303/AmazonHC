@@ -1310,6 +1310,10 @@ function pilTxt(d){
 }
 const spMap={avail:'sp-avail',booked:'sp-booked',lim:'sp-lim',full:'sp-full',excl:'sp-excl'};
 const pillLabel={avail:'safe',booked:'booked',lim:'left',full:'full',excl:'excl'};
+function pillSubLabel(d,pc){
+  if(pc==='booked'){const r=calc(d);const safe=Math.max(0,r.safe);return safe>0?safe+'h left':'full';}
+  return pillLabel[pc]||'';
+}
 
 /* ═══════ STATUS OPTIONS ═══════ */
 const statusOpts=[
@@ -1345,7 +1349,7 @@ function makeSmallTile(d,isToday){
       <input class="${iCls}" type="number" min="0" max="12" step="0.5"
         value="${hrsVal||''}" placeholder="0" data-d="${d}" aria-label="Hours for ${fmtS(d)}"/>
     </div>
-    <span class="spill ${spMap[pc]||'sp-avail'}">${pt} <span style="opacity:.6;font-size:8px">${pillLabel[pc]||''}</span></span>`;
+    <span class="spill ${spMap[pc]||'sp-avail'}">${pt} <span style="font-size:9px;font-weight:600">${pillSubLabel(d,pc)}</span></span>`;
   return tile;
 }
 
@@ -1372,7 +1376,7 @@ function makeTodayTile(d){
       <select class="glass-select" data-d="${d}">${opts}</select>
       <input class="${iCls}" type="number" min="0" max="12" step="0.5"
         value="${hrsVal||''}" placeholder="0h" data-d="${d}" aria-label="Hours for today"/>
-      <span class="spill ${spMap[pc]||'sp-avail'}" style="font-size:13px;padding:8px 14px;border-radius:12px">${pt} <span style="opacity:.7;font-size:10px">${pillLabel[pc]||''}</span></span>
+      <span class="spill ${spMap[pc]||'sp-avail'}" style="font-size:13px;padding:8px 14px;border-radius:12px">${pt} <span style="font-size:11px;font-weight:600">${pillSubLabel(d,pc)}</span></span>
     </div>`;
   return tile;
 }
@@ -1552,7 +1556,7 @@ function refreshPills(){
     if(pill){
       pill.className='spill '+(spMap[pc]||'sp-avail');
       if(t.classList.contains('today-tile'))pill.style.cssText='font-size:13px;padding:8px 14px;border-radius:12px';
-      pill.innerHTML=`${pt} <span style="opacity:.6;font-size:${t.classList.contains('today-tile')?'10':'8'}px">${pillLabel[pc]||''}</span>`;
+      pill.innerHTML=`${pt} <span style="font-size:${t.classList.contains('today-tile')?'11':'9'}px;font-weight:600">${pillSubLabel(d,pc)}</span>`;
     }
     const inp=t.querySelector('input');
     if(inp){
