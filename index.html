@@ -1627,28 +1627,6 @@ function renderSummary(){
   document.getElementById('summary').innerHTML=`
     <div class="summary-title">Live summary · ${fmtS(today)}</div>
     <div class="alert-bar ${abCls}">${abMsg}</div>
-    <div class="cards">
-      <div class="mcard">
-        <div class="mc-lbl">Safe today</div>
-        <div class="mc-val ${sc}">${r.safe}h</div>
-        <div class="mc-sub">${r.safe===0?'Full · 0h':r.safe<4?'Limited':'Available'}</div>
-      </div>
-      <div class="mcard">
-        <div class="mc-lbl">Worst window</div>
-        <div class="mc-val ${wc}">${+r.worst.toFixed(1)}h</div>
-        <div class="mc-sub">of 24h cap</div>
-      </div>
-      <div class="mcard">
-        <div class="mc-lbl">Naive (back only)</div>
-        <div class="mc-val mc-white">${r.raw}h</div>
-        <div class="mc-sub">${r.blockedByFuture?'Cut by future':'Same as safe'}</div>
-      </div>
-      <div class="mcard">
-        <div class="mc-lbl">Future blocking</div>
-        <div class="mc-val ${r.blockedByFuture?'mc-amber':'mc-white'}">${r.blockedByFuture?'Yes':'No'}</div>
-        <div class="mc-sub">${r.futureDates.length?r.futureDates.map(fmtS).join(', '):'None'}</div>
-      </div>
-    </div>
     <div class="win-title">Amazon work weeks · Wed → Tue</div>
     <div class="win-grid aw-win-grid">${(()=>{
       const todayDate=pd(today);
@@ -1683,33 +1661,6 @@ function renderSummary(){
           <div class="wg-bar-wrap"><div class="wg-bar-fill" style="width:${pct}%;background:${col};box-shadow:0 0 5px ${col}66"></div></div>
           ${tag}
         </div>`;
-      }).join('');
-    })()}</div>
-    <div class="win-title">7 overlapping windows · worst sets your limit</div>
-    <div class="win-grid">${(()=>{
-      // Find the single worst cell: only flag if total>0; on a tie, pick the last (T, index 6) as it's most relevant
-      const maxVal=r.worst;
-      const worstIdx=maxVal===0 ? -1 : r.wins.reduce((best,w,i)=>w.total===maxVal?i:best,-1);
-      return r.wins.map((w,i)=>{
-      const isW=i===worstIdx;
-      const offLabel=['T−6','T−5','T−4','T−3','T−2','T−1','T\u00a0(today)'][i];
-      const startShort=fmtS(w.start);
-      const endShort=fmtS(addD(w.start,6));
-      const pct=Math.min(100,(w.total/24)*100);
-      const col=w.total>=24?'#FF5F6D':w.total>=20?'#FFB347':'#00D4FF';
-      const safe=Math.max(0,+(24-w.total).toFixed(1));
-      const safeCol=safe===0?'#FF5F6D':safe<4?'#FFB347':'#00D4FF';
-      return`<div class="wg-cell${isW?' wg-worst':''}">
-        <div class="wg-off">${offLabel}</div>
-        <div class="wg-range">${startShort}<br/>${endShort}</div>
-        <div class="wg-hrs" style="color:${col};text-shadow:0 0 16px ${col}55">${+w.total.toFixed(1)}h</div>
-        <div class="wg-cap">/ 24h used</div>
-        <div class="wg-bar-wrap"><div class="wg-bar-fill" style="width:${pct}%;background:${col};box-shadow:0 0 5px ${col}66"></div></div>
-        ${isW
-          ?`<div class="wg-worst-tag">▲ worst</div>`
-          :`<div class="wg-safe-tag" style="color:${safeCol};background:${safeCol}1A">${safe}h free</div>`
-        }
-      </div>`;
       }).join('');
     })()}</div>
     ${chips?`<div class="chips-wrap"><div class="win-title" style="margin-top:1.25rem">All shifts</div><div class="chips">${chips}</div></div>`
