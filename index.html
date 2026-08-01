@@ -1125,10 +1125,11 @@ body{
 .cal-day-hrs{
   display:block;font-size:13px;font-weight:900;margin-top:1px;line-height:1;
   animation:hrsGlow 2s ease-in-out infinite alternate;
+  will-change:opacity;
 }
 @keyframes hrsGlow{
-  from{text-shadow:0 0 6px currentColor,0 0 12px currentColor;}
-  to{text-shadow:0 0 14px currentColor,0 0 28px currentColor,0 0 4px #fff;}
+  from{opacity:.75;}
+  to{opacity:1;}
 }
 
 /* Amazon week strip */
