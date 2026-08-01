@@ -1239,7 +1239,7 @@ body{
 .cd-prog-wrap{width:100%;height:18px;background:rgba(255,255,255,0.07);border-radius:9px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);}
 .cd-prog-bar{height:100%;width:0%;background:linear-gradient(90deg,#00C853,#00E676,#69F0AE);border-radius:9px;transition:width .5s ease;box-shadow:0 0 10px rgba(0,230,118,0.7),inset 0 1px 0 rgba(255,255,255,0.25);}
 
-.cd-scene{position:relative;height:140px;overflow:hidden;}
+.cd-scene{position:relative;height:140px;overflow:hidden;contain:layout style;transform:translateZ(0);}
 
 /* Sky */
 .cd-sky{position:absolute;inset:0;background:linear-gradient(180deg,#0a1628 0%,#0d2044 60%,#1a3a2a 100%);}
@@ -1286,11 +1286,11 @@ body{
 @keyframes doorOpen{0%,55%{opacity:0;}60%{opacity:1;}75%{opacity:0;}100%{opacity:0;}}
 
 /* Person */
-.cd-person{position:absolute;bottom:16px;width:44px;height:62px;animation:personWalk 5s linear infinite;}
+.cd-person{position:absolute;bottom:16px;left:0;width:44px;height:62px;will-change:transform;animation:personWalk 5s linear infinite;}
 @keyframes personWalk{
-  0%{left:-80px;}
-  55%{left:calc(100% - 118px);}
-  100%{left:calc(100% - 118px);}
+  0%{transform:translateX(-80px);}
+  55%{transform:translateX(220px);}
+  100%{transform:translateX(220px);}
 }
 /* Parcel sits in outstretched arms — centred on person, at arm height */
 .cd-held-parcel{
