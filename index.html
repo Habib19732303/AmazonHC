@@ -1121,8 +1121,15 @@ body{
 .aw-w1{background:rgba(167,139,250,0.12)!important;border-color:rgba(167,139,250,0.25)!important;}
 .aw-w2{background:rgba(0,230,118,0.10)!important;border-color:rgba(0,230,118,0.22)!important;}
 .aw-w3{background:rgba(255,179,71,0.10)!important;border-color:rgba(255,179,71,0.22)!important;}
-.cal-day-num{display:block;line-height:1;}
-.cal-day-hrs{display:block;font-size:9px;font-weight:700;margin-top:2px;opacity:.95;line-height:1;}
+.cal-day-num{display:block;line-height:1;font-size:.7em;opacity:.6;}
+.cal-day-hrs{
+  display:block;font-size:13px;font-weight:900;margin-top:1px;line-height:1;
+  animation:hrsGlow 2s ease-in-out infinite alternate;
+}
+@keyframes hrsGlow{
+  from{text-shadow:0 0 6px currentColor,0 0 12px currentColor;}
+  to{text-shadow:0 0 14px currentColor,0 0 28px currentColor,0 0 4px #fff;}
+}
 
 /* Amazon week strip */
 .aw-start{border-top:2px solid var(--accent)!important;border-top-left-radius:12px;border-top-right-radius:4px;}
