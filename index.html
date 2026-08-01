@@ -1231,11 +1231,13 @@ body{
 .cd-label{display:flex;align-items:center;gap:6px;font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);padding:6px 12px 4px;background:rgba(0,0,0,0.3);}
 .cd-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#FF9900;box-shadow:0 0 8px #FF9900;animation:cdDot 1.2s ease-in-out infinite alternate;}
 @keyframes cdDot{from{opacity:.4;}to{opacity:1;box-shadow:0 0 14px #FF9900;}}
-.cd-counter{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.cd-counter{margin-left:auto;display:flex;align-items:center;gap:6px;}
 .cd-count-txt{font-size:11px;font-weight:900;color:#FF9900;letter-spacing:.05em;transition:color .3s,transform .3s;display:inline-block;}
 .cd-count-txt span{color:#fff;opacity:.5;}
-.cd-prog-wrap{flex:1;height:12px;background:rgba(255,255,255,0.08);border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);}
-.cd-prog-bar{height:100%;width:0%;background:linear-gradient(90deg,#00C853,#69F0AE);border-radius:6px;transition:width .5s ease;box-shadow:0 0 8px rgba(0,200,83,0.6);}
+/* Standalone full-width progress bar below animation */
+.cd-prog-outer{padding:6px 10px 10px;background:rgba(0,0,0,0.3);}
+.cd-prog-wrap{width:100%;height:18px;background:rgba(255,255,255,0.07);border-radius:9px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);}
+.cd-prog-bar{height:100%;width:0%;background:linear-gradient(90deg,#00C853,#00E676,#69F0AE);border-radius:9px;transition:width .5s ease;box-shadow:0 0 10px rgba(0,230,118,0.7),inset 0 1px 0 rgba(255,255,255,0.25);}
 
 .cd-scene{position:relative;height:140px;overflow:hidden;}
 
@@ -1519,8 +1521,10 @@ body{
       <span class="cd-dot"></span>Amazon Flex Driver
       <div class="cd-counter">
         <span class="cd-count-txt" id="cdCountTxt">1<span>/48</span></span>
-        <div class="cd-prog-wrap"><div class="cd-prog-bar" id="cdProgBar"></div></div>
       </div>
+    </div>
+    <div class="cd-prog-outer">
+      <div class="cd-prog-wrap"><div class="cd-prog-bar" id="cdProgBar"></div></div>
     </div>
   </div>
 </aside>
